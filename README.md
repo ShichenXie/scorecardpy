@@ -1,6 +1,6 @@
 # scorecardpy
 
-This package is python version of R package scorecard. It makes the development of credit risk scorecard easily and efficiently by providing functions as follows: 
+This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). It makes the development of credit risk scorecard easily and efficiently by providing functions as follows: 
 - information value (iv), 
 - variable filter (var_filter), 
 - optimal woe binning (woebin, woebin_ply, woebin_plot, woebin_adj), 
@@ -9,6 +9,10 @@ This package is python version of R package scorecard. It makes the development 
 
 ## Installation
 
+Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
+```
+pip install scorecardpy
+```
 
 ## Example
 
