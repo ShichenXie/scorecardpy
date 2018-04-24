@@ -20,35 +20,35 @@ This is a basic example which shows you how to develop a common credit risk scor
 
 ``` python
 # Traditional Credit Scoring Using Logistic Regression
-from scorecardpy import *
+import scorecardpy as sc
 
 # data prepare ------
 # load germancredit data
-dat = germancredit()
+dat = sc.germancredit()
 
 # filter variable via missing rate, iv, identical value rate
-dt_s = var_filter(dat, y="creditability")
+dt_s = sc.var_filter(dat, y="creditability")
 
 # breaking dt into train and test
-train, test = split_df(dt_s, 'creditability').values()
+train, test = sc.split_df(dt_s, 'creditability').values()
 
 # woe binning ------
-bins = woebin(dt_s, y="creditability")
-# woebin_plot(bins)
+bins = sc.woebin(dt_s, y="creditability")
+# sc.woebin_plot(bins)
 
 # binning adjustment
 # # adjust breaks interactively
-# breaks_adj = woebin_adj(dt_s, "creditability", bins) 
+# breaks_adj = sc.woebin_adj(dt_s, "creditability", bins) 
 # # or specify breaks manually
 breaks_adj = {
     'age.in.years': [26, 35, 40],
     'other.debtors.or.guarantors': ["none", "co-applicant%,%guarantor"]
 }
-bins_adj = woebin(dt_s, y="creditability", breaks_list=breaks_adj)
+bins_adj = sc.woebin(dt_s, y="creditability", breaks_list=breaks_adj)
 
 # converting train and test into woe values
-train_woe = woebin_ply(train, bins_adj)
-test_woe = woebin_ply(test, bins_adj)
+train_woe = sc.woebin_ply(train, bins_adj)
+test_woe = sc.woebin_ply(test, bins_adj)
 
 y_train = train_woe[['creditability']].loc[:,'creditability']
 X_train = train_woe.loc[:,train_woe.columns != 'creditability']
@@ -63,21 +63,21 @@ lr.fit(X_train, y_train)
 # lr.intercept_
 
 # predicted proability
-pred_train = lr.predict_proba(X_train)[:,1]
-pred_test = lr.predict_proba(X_test)[:,1]
+train_pred = lr.predict_proba(X_train)[:,1]
+test_pred = lr.predict_proba(X_test)[:,1]
 
 # performance ks & roc ------
-perf_train = perf_eva(y_train, pred_train, title = "train")
-perf_test = perf_eva(y_test, pred_test, title = "test")
+train_perf = sc.perf_eva(y_train, train_pred, title = "train")
+test_perf = sc.perf_eva(y_test, test_pred, title = "test")
 
 # score ------
-card = scorecard(bins_adj, lr, X_train.columns)
+card = sc.scorecard(bins_adj, lr, X_train.columns)
 # credit score
-train_score = scorecard_ply(train, card, print_step=0)
-test_score = scorecard_ply(test, card, print_step=0)
+train_score = sc.scorecard_ply(train, card, print_step=0)
+test_score = sc.scorecard_ply(test, card, print_step=0)
 
 # psi
-psirt = perf_psi(
+sc.perf_psi(
   score = {'train':train_score, 'test':test_score},
   label = {'train':y_train, 'test':y_test},
   x_limits = [250, 750],
