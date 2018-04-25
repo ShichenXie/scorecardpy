@@ -50,9 +50,9 @@ bins_adj = sc.woebin(dt_s, y="creditability", breaks_list=breaks_adj)
 train_woe = sc.woebin_ply(train, bins_adj)
 test_woe = sc.woebin_ply(test, bins_adj)
 
-y_train = train_woe[['creditability']].loc[:,'creditability']
+y_train = train_woe.loc[:,'creditability']
 X_train = train_woe.loc[:,train_woe.columns != 'creditability']
-y_test = test_woe[['creditability']].loc[:,'creditability']
+y_test = test_woe.loc[:,'creditability']
 X_test = test_woe.loc[:,train_woe.columns != 'creditability']
 
 # logistic regression ------

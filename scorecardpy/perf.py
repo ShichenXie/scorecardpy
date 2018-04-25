@@ -45,7 +45,7 @@ def eva_pks(dfkslift, title):
     # ks vline
     plt.plot([dfks['group'], dfks['group']], [0, dfks['ks']], 'r--')
     # set xylabel
-    plt.gca().set(title=(''if title is None else title+': ')+'K-S', 
+    plt.gca().set(title=title+'K-S', 
       xlabel='% of population', ylabel='% of total Good/Bad', 
       xlim=[0,1], ylim=[0,1], aspect='equal')
     # text
@@ -66,7 +66,7 @@ def eva_plift(dfkslift, title):
     # ks vline
     plt.plot([0, 1], [badrate_avg, badrate_avg], 'r--')
     # set xylabel
-    plt.gca().set(title=(''if title is None else title+': ')+'Lift', 
+    plt.gca().set(title=title+'Lift', 
       xlabel='% of population', ylabel='% of Bad', 
       xlim=[0,1], ylim=[0,1], aspect='equal')
     # text
@@ -116,7 +116,7 @@ def eva_proc(dfrocpr, title):
     # fill 
     plt.fill_between(dfrocpr.FPR, 0, dfrocpr.TPR, color='blue', alpha=0.1)
     # set xylabel
-    plt.gca().set(title=(''if title is None else title+': ')+'ROC',
+    plt.gca().set(title=title+'ROC',
       xlabel='FPR', ylabel='TPR', 
       xlim=[0,1], ylim=[0,1], aspect='equal')
     # text
@@ -135,7 +135,7 @@ def eva_ppr(dfrocpr, title):
     x=np.array(np.arange(0,1.1,0.1))
     plt.plot(x, x, 'r--')
     # set xylabel
-    plt.gca().set(title=(''if title is None else title+': ')+'P-R', 
+    plt.gca().set(title=title+'P-R', 
       xlabel='Recall', ylabel='Precision', 
       xlim=[0,1], ylim=[0,1], aspect='equal')
     # text
@@ -155,7 +155,7 @@ def eva_pf1(dfrocpr, title):
     F1max_F1 = dfrocpr.loc[dfrocpr['F1'].idxmax(),'F1']
     plt.plot([F1max_pop,F1max_pop], [0,F1max_F1], 'r--')
     # set xylabel
-    plt.gca().set(title=(''if title is None else title+': ')+'F1', 
+    plt.gca().set(title=title+'F1', 
       xlabel='% of population', ylabel='F1', 
       xlim=[0,1], ylim=[0,1], aspect='equal')
     # pred text
@@ -268,7 +268,7 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
     # check label
     df = check_y(df, 'label', positive)
     # title
-    if title is not None: title=title+': '
+    title='' if title is None else str(title)+': '
     
     ### data ###
     # dfkslift ------
