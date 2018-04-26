@@ -882,10 +882,10 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
         # create bin column
         breaks_binx_other = np.unique(list(map(float, ['-inf']+[re.match(r'.*\[(.*),.+\).*', str(i)).group(1) for i in binx_other['bin']]+['inf'])))
         labels = ['[{},{})'.format(breaks_binx_other[i], breaks_binx_other[i+1]) for i in range(len(breaks_binx_other)-1)]
-        dtx = dtx.assign(xi_bin = lambda x: pd.cut(x[x_i], breaks_binx_other, right=False, labels=labels))
-        # dtx.loc[:,'xi_bin']
-        # dtx['xi_bin'] = pd.cut(dtx[x_i], breaks_binx_other, right=False, labels=labels)
-        dtx.loc[:,'xi_bin'] = np.where(pd.isnull(dtx['xi_bin']), dtx['xi_bin'], dtx['xi_bin'].astype(str))
+        dtx = dtx.assign(xi_bin = lambda x: pd.cut(x[x_i], breaks_binx_other, right=False, labels=labels))\
+          .assign(xi_bin = lambda x: [i if (i != i) else str(i) for i in x['xi_bin']])
+        # dtx.loc[:,'xi_bin'] = pd.cut(dtx[x_i], breaks_binx_other, right=False, labels=labels)
+        # dtx.loc[:,'xi_bin'] = np.where(pd.isnull(dtx['xi_bin']), dtx['xi_bin'], dtx['xi_bin'].astype(str))
         #
         mask = dtx[x_i].isin(binx_sv['V1'])
         dtx.loc[mask,'xi_bin'] = dtx.loc[mask, x_i]
