@@ -5,34 +5,52 @@ import warnings
 from .condition_fun import *
 from .info_value import *
 
-#' Variable Filter
-#'
-#' This function filter variables base on specified conditions, such as information value, missing rate, identical value rate.
-#'
-#' @param dt A data frame with both x (predictor/feature) and y (response/label) variables.
-#' @param y Name of y variable.
-#' @param x Name of x variables. Default is NULL. If x is NULL, then all variables except y are counted as x variables.
-#' @param iv_limit The information value of kept variables should >= iv_limit. The default is 0.02.
-#' @param missing_limit The missing rate of kept variables should <= missing_limit. The default is 0.95.
-#' @param identical_limit The identical value rate (excluding NAs) of kept variables should <= identical_limit. The default is 0.95.
-#' @param var_rm Name of force removed variables, default is NULL.
-#' @param var_kp Name of force kept variables, default is NULL.
-#' @param return_rm_reason Logical, default is FALSE.
-#' @param positive Value of positive class, default is "bad|1".
-#' @return A data.table with y and selected x variables and a data.table with the reason of removed x variable if return_rm_reason == TRUE.
-#'
-#' @examples
-#' # Load German credit data
-#' data(germancredit)
-#'
-#' # variable filter
-#' dt_sel = var_filter(germancredit, y = "creditability")
-#'
-#'
-#' @import data.table
-#' @export
-#'
+
 def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95, identical_limit=0.95, var_rm=None, var_kp=None, return_rm_reason=False, positive='bad|1'):
+    '''
+    Variable Filter
+    ------
+    This function filter variables base on specified conditions, such as 
+    information value, missing rate, identical value rate.
+    
+    Params
+    ------
+    dt: A data frame with both x (predictor/feature) and y 
+      (response/label) variables.
+    y: Name of y variable.
+    x: Name of x variables. Default is NULL. If x is NULL, then all 
+      variables except y are counted as x variables.
+    iv_limit: The information value of kept variables should>=iv_limit. 
+      The default is 0.02.
+    missing_limit: The missing rate of kept variables should<=missing_limit. 
+      The default is 0.95.
+    identical_limit: The identical value rate (excluding NAs) of kept 
+      variables should <= identical_limit. The default is 0.95.
+    var_rm: Name of force removed variables, default is NULL.
+    var_kp: Name of force kept variables, default is NULL.
+    return_rm_reason: Logical, default is FALSE.
+    positive: Value of positive class, default is "bad|1".
+    
+    Returns
+    ------
+    DataFrame
+        A data.table with y and selected x variables
+    Dict(if return_rm_reason == TRUE)
+        A DataFrame with y and selected x variables and 
+          a DataFrame with the reason of removed x variable.
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # variable filter
+    dt_sel = sc.var_filter(dat, y = "creditability")
+    '''
+    
+    dt = dt.copy(deep=True)
     # remove date/time col
     dt = rm_datetime_col(dt)
     # replace "" by NA

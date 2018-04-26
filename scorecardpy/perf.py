@@ -175,83 +175,86 @@ def eva_pf1(dfrocpr, title):
     # plt.show()
     # return fig
     
-#' KS, ROC, Lift, PR
-#'
-#' \code{perf_eva} provides performance evaluations, such as kolmogorov-smirnow(ks), ROC, lift and precision-recall curves, based on provided label and predicted probability values.
-#'
-#' @name perf_eva
-#' @param label Label values, such as 0s and 1s, 0 represent for good and 1 for bad.
-#' @param pred Predicted probability or score.
-#' @param title Title of plot, default is "performance".
-#' @param groupnum The group number when calculating KS.  Default NULL, which means the number of sample size.
-#' @param type Types of performance plot, such as "ks", "lift", "roc", "pr". Default c("ks", "roc").
-#' @param show_plot Logical value, default is TRUE. It means whether to show plot.
-#' @param positive Value of positive class, default is "bad|1".
-#' @param seed Integer, default is 186. The specify seed is used for random sorting data.
-#' @return ks, roc, lift, pr
-#'
-#' @details
-#' Accuracy = true positive and true negative/total cases
-#'
-#' Error rate = false positive and false negative/total cases
-#'
-#' TPR, True Positive Rate(Recall or Sensitivity) = true positive/total actual positive
-#'
-#' PPV, Positive Predicted Value(Precision) = true positive/total predicted positive
-#'
-#' TNR, True Negative Rate(Specificity) = true negative/total actual negative
-#'
-#' NPV, Negative Predicted Value = true negative/total predicted negative
-#'
-#'
-#'
-#'
-#'
-# https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values
-# ROC curve: Sensitivity ~ 1-Specificity with different threshold
-# Lift chart: Lift(PV+/p1) ~ Depth with different threshold
-# Gains chart: PV + ~ Depth with different threshold
-#'
-#' @seealso \code{\link{perf_psi}}
-#'
-#' @examples
-#' \dontrun{
-#' # load germancredit data
-#' data("germancredit")
-#'
-#' # filter variable via missing rate, iv, identical value rate
-#' dt_sel = var_filter(germancredit, "creditability")
-#'
-#' # woe binning ------
-#' bins = woebin(dt_sel, "creditability")
-#' dt_woe = woebin_ply(dt_sel, bins)
-#'
-#' # glm ------
-#' m1 = glm( creditability ~ ., family = binomial(), data = dt_woe)
-#' # summary(m1)
-#'
-#' # Select a formula-based model by AIC
-#' m_step = step(m1, direction="both", trace=FALSE)
-#' m2 = eval(m_step$call)
-#' # summary(m2)
-#'
-#' # predicted proability
-#' dt_pred = predict(m2, type='response', dt_woe)
-#'
-#' # performance ------
-#' # Example I # only ks & auc values
-#' perf_eva(dt_woe$creditability, dt_pred, show_plot=FALSE)
-#'
-#' # Example II # ks & roc plot
-#' perf_eva(dt_woe$creditability, dt_pred)
-#'
-#' # Example III # ks, lift, roc & pr plot
-#' perf_eva(dt_woe$creditability, dt_pred, type = c("ks","lift","roc","pr"))
-#' }
-#' @import data.table ggplot2 gridExtra
-#' @export
-#'
+
+
 def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], show_plot=True, positive="bad|1", seed=186):
+    '''
+    KS, ROC, Lift, PR
+    ------
+    perf_eva provides performance evaluations, such as 
+    kolmogorov-smirnow(ks), ROC, lift and precision-recall curves, 
+    based on provided label and predicted probability values.
+    
+    Params
+    ------
+    label: Label values, such as 0s and 1s, 0 represent for good 
+      and 1 for bad.
+    pred: Predicted probability or score.
+    title: Title of plot, default is "performance".
+    groupnum: The group number when calculating KS.  Default NULL, 
+      which means the number of sample size.
+    plot_type: Types of performance plot, such as "ks", "lift", "roc", "pr". 
+      Default c("ks", "roc").
+    show_plot: Logical value, default is TRUE. It means whether to show plot.
+    positive: Value of positive class, default is "bad|1".
+    seed: Integer, default is 186. The specify seed is used for random sorting data.
+    
+    Returns
+    ------
+    dict
+        ks, auc, gini values, and figure objects
+    
+    Details
+    ------
+    Accuracy = 
+        true positive and true negative/total cases
+    Error rate = 
+        false positive and false negative/total cases
+    TPR, True Positive Rate(Recall or Sensitivity) = 
+        true positive/total actual positive
+    PPV, Positive Predicted Value(Precision) = 
+        true positive/total predicted positive
+    TNR, True Negative Rate(Specificity) = 
+        true negative/total actual negative
+    NPV, Negative Predicted Value = 
+        true negative/total predicted negative
+        
+    Examples
+    ------
+    import scorecardpy
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # filter variable via missing rate, iv, identical value rate
+    dt_sel = sc.var_filter(dat, "creditability")
+    
+    # woe binning ------
+    bins = sc.woebin(dt_sel, "creditability")
+    dt_woe = sc.woebin_ply(dt_sel, bins)
+    
+    y = dt_woe.loc[:,'creditability']
+    X = dt_woe.loc[:,dt_woe.columns != 'creditability']
+    
+    # logistic regression ------
+    from sklearn.linear_model import LogisticRegression
+    lr = LogisticRegression(penalty='l1', C=0.9, solver='saga')
+    lr.fit(X, y)
+    
+    # predicted proability
+    dt_pred = lr.predict_proba(X)[:,1]
+
+    # performace ------
+    # Example I # only ks & auc values
+    sc.perf_eva(y, dt_pred, show_plot=False)
+    
+    # Example II # ks & roc plot
+    sc.perf_eva(y, dt_pred)
+    
+    # Example III # ks, lift, roc & pr plot
+    sc.perf_eva(y, dt_pred, plot_type = ["ks","lift","roc","pr"])
+    '''
+    
     # inputs checking
     if len(label) != len(pred):
         warnings.warn('Incorrect inputs; label and pred should be list with the same length.')
@@ -315,101 +318,111 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
     return rt
     
 
-#' PSI
-#'
-#' \code{perf_psi} calculates population stability index (PSI) and provides credit score distribution based on credit score datasets.
-#'
-#' @param score A list of credit score for actual and expected data samples. For example, score = list(actual = score_A, expect = score_E), both score_A and score_E are dataframes with the same column names.
-#' @param label A list of label value for actual and expected data samples. The default is NULL. For example, label = list(actual = label_A, expect = label_E), both label_A and label_E are vectors or dataframes. The label values should be 0s and 1s, 0 represent for good and 1 for bad.
-#' @param title Title of plot, default is NULL.
-#' @param x_limits x-axis limits, default is c(100, 800).
-#' @param x_tick_break x-axis ticker break, default is 50.
-#' @param show_plot Logical, default is TRUE. It means whether to show plot.
-#' @param return_distr_dat Logical, default is FALSE.
-#' @param seed Integer, default is 186. The specify seed is used for random sorting data.
-#'
-#' @return a dataframe of psi & plots of credit score distribution
-#'
-#' @details The population stability index (PSI) formula is displayed below: \deqn{PSI = \sum((Actual\% - Expected\%)*(\ln(\frac{Actual\%}{Expected\%}))).} The rule of thumb for the PSI is as follows: Less than 0.1 inference insignificant change, no action required; 0.1 - 0.25 inference some minor change, check other scorecard monitoring metrics; Greater than 0.25 inference major shift in population, need to delve deeper.
-#'
-#' @seealso \code{\link{perf_eva}}
-#'
-#' @examples
-#' \dontrun{
-#' # load germancredit data
-#' data("germancredit")
-#'
-#' # filter variable via missing rate, iv, identical value rate
-#' dt_sel = var_filter(germancredit, "creditability")
-#'
-#' # breaking dt into train and test ------
-#' dt_list = split_df(dt_sel, "creditability", ratio = 0.6, seed=21)
-#' dt_train = dt_list$train; dt_test = dt_list$test
-#'
-#' # woe binning ------
-#' bins = woebin(dt_train, "creditability")
-#'
-#' # converting train and test into woe values
-#' train = woebin_ply(dt_train, bins)
-#' test = woebin_ply(dt_test, bins)
-#'
-#' # glm ------
-#' m1 = glm(creditability ~ ., family = binomial(), data = train)
-#' # summary(m1)
-#'
-#' # Select a formula-based model by AIC
-#' m_step = step(m1, direction="both", trace=FALSE)
-#' m2 = eval(m_step$call)
-#' # summary(m2)
-#'
-#' # predicted proability
-#' train_pred = predict(m2, type='response', train)
-#' test_pred = predict(m2, type='response', test)
-#'
-#' # # ks & roc plot
-#' # perf_eva(train$creditability, train_pred, title = "train")
-#' # perf_eva(test$creditability, test_pred, title = "test")
-#'
-#' #' # scorecard
-#' card = scorecard(bins, m2)
-#'
-#' # credit score, only_total_score = TRUE
-#' train_score = scorecard_ply(dt_train, card)
-#' test_score = scorecard_ply(dt_test, card)
-#'
-#' # Example I # psi
-#' psi = perf_psi(
-#'   score = list(train = train_score, test = test_score),
-#'   label = list(train = train$creditability, test = test$creditability)
-#' )
-#' # psi$psi  # psi dataframe
-#' # psi$pic  # pic of score distribution
-#'
-#' # Example II # specifying score range
-#' psi_s = perf_psi(
-#'   score = list(train = train_score, test = test_score),
-#'   label = list(train = train$creditability, test = test$creditability),
-#'   x_limits = c(200, 750),
-#'   x_tick_break = 50
-#'   )
-#'
-#' # Example III # credit score, only_total_score = FALSE
-#' train_score2 = scorecard_ply(dt_train, card, only_total_score=FALSE)
-#' test_score2 = scorecard_ply(dt_test, card, only_total_score=FALSE)
-#'
-#' # psi
-#' psi2 = perf_psi(
-#'   score = list(train = train_score2, test = test_score2),
-#'   label = list(train = train$creditability, test = test$creditability)
-#' )
-#' # psi2$psi  # psi dataframe
-#' # psi2$pic  # pic of score distribution
-#' }
-#' @import data.table ggplot2 gridExtra
-#' @export
-#'
-def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50, 
-             show_plot=True, seed=186, return_distr_dat=False):
+
+def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50, show_plot=True, seed=186, return_distr_dat=False):
+    '''
+    PSI
+    ------
+    perf_psi calculates population stability index (PSI) and provides 
+    credit score distribution based on credit score datasets.
+    
+    Params
+    ------
+    score: A list of credit score for actual and expected data samples. 
+      For example, score = list(actual = score_A, expect = score_E), both 
+      score_A and score_E are dataframes with the same column names.
+    label: A list of label value for actual and expected data samples. 
+      The default is NULL. For example, label = list(actual = label_A, 
+      expect = label_E), both label_A and label_E are vectors or 
+      dataframes. The label values should be 0s and 1s, 0 represent for 
+      good and 1 for bad.
+    title: Title of plot, default is NULL.
+    x_limits: x-axis limits, default is c(100, 800).
+    x_tick_break: x-axis ticker break, default is 50.
+    show_plot: Logical, default is TRUE. It means whether to show plot.
+    return_distr_dat: Logical, default is FALSE.
+    seed: Integer, default is 186. The specify seed is used for random 
+      sorting data.
+    
+    Returns
+    ------
+    dict
+        psi values and figure objects
+        
+    Details
+    ------
+    The population stability index (PSI) formula is displayed below: 
+    \deqn{PSI = \sum((Actual\% - Expected\%)*(\ln(\frac{Actual\%}{Expected\%}))).} 
+    The rule of thumb for the PSI is as follows: Less than 0.1 inference 
+    insignificant change, no action required; 0.1 - 0.25 inference some 
+    minor change, check other scorecard monitoring metrics; Greater than 
+    0.25 inference major shift in population, need to delve deeper.
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # filter variable via missing rate, iv, identical value rate
+    dt_sel = sc.var_filter(dat, "creditability")
+    
+    # breaking dt into train and test ------
+    train, test = sc.split_df(dt_sel, 'creditability').values()
+    
+    # woe binning ------
+    bins = sc.woebin(train, "creditability")
+    
+    # converting train and test into woe values
+    train_woe = sc.woebin_ply(train, bins)
+    test_woe = sc.woebin_ply(test, bins)
+    
+    y_train = train_woe.loc[:,'creditability']
+    X_train = train_woe.loc[:,train_woe.columns != 'creditability']
+    y_test = test_woe.loc[:,'creditability']
+    X_test = test_woe.loc[:,train_woe.columns != 'creditability']
+
+    # logistic regression ------
+    from sklearn.linear_model import LogisticRegression
+    lr = LogisticRegression(penalty='l1', C=0.9, solver='saga')
+    lr.fit(X_train, y_train)
+    
+    # predicted proability
+    pred_train = lr.predict_proba(X_train)[:,1]
+    pred_test = lr.predict_proba(X_test)[:,1]
+    
+    # performance ks & roc ------
+    perf_train = sc.perf_eva(y_train, pred_train, title = "train")
+    perf_test = sc.perf_eva(y_test, pred_test, title = "test")
+    
+    # score ------
+    # scorecard
+    card = sc.scorecard(bins, lr, X_train.columns)
+    # credit score
+    train_score = sc.scorecard_ply(train, card)
+    test_score = sc.scorecard_ply(test, card)
+    
+    # Example I # psi
+    psi1 = sc.perf_psi(
+      score = {'train':train_score, 'test':test_score},
+      label = {'train':y_train, 'test':y_test},
+      x_limits = [250, 750],
+      x_tick_break = 50
+    )
+    
+    # Example II # credit score, only_total_score = FALSE
+    train_score2 = sc.scorecard_ply(train, card, only_total_score=False)
+    test_score2 = sc.scorecard_ply(test, card, only_total_score=False)
+    # psi
+    psi2 = sc.perf_psi(
+      score = {'train':train_score2, 'test':test_score2},
+      label = {'train':y_train, 'test':y_test},
+      x_limits = [250, 750],
+      x_tick_break = 50
+    )
+    '''
+    
     # inputs checking
     ## score
     if not isinstance(score, dict) and len(score) != 2:
@@ -417,7 +430,8 @@ def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50,
     else:
         if any([not isinstance(i, pd.DataFrame) for i in score.values()]):
             raise Exception("Incorrect inputs; score is a dictionary of two dataframes.")
-        if len(np.unique([list(i.columns) for i in score.values()])) != 1:
+        score_columns = [list(i.columns) for i in score.values()]
+        if set(score_columns[0]) != set(score_columns[1]):
             raise Exception("Incorrect inputs; the column names of two dataframes in score should be the same.")
     ## label
     if label is not None:
@@ -476,6 +490,8 @@ def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50,
             # cut
             labels = ['[{},{})'.format(int(brkp[i]), int(brkp[i+1])) for i in range(len(brkp)-1)]
             dat.loc[:,'bin'] = pd.cut(dat[sn], brkp, right=False, labels=labels)
+        else:
+            dat.loc[:,'bin'] = dat[sn]
         # psi ------
         rt_psi[sn] = pd.DataFrame({'PSI':psi(dat)},index=np.arange(1)) 
     

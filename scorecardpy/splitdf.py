@@ -6,24 +6,38 @@ import warnings
 from .condition_fun import *
 
 
-#' Split a dataset
-#'
-#' @param dt A data frame.
-#' @param y Name of y variable, default is NULL. The input data will split based on the predictor y, if it is provide.
-#' @param ratio A numeric value, default is 0.7. It indicates the ratio of total rows contained in one split, must less than 1.
-#' @param seed A random seed, default is 186.
-#'
-#' @examples
-#' # Load German credit data
-#' data(germancredit)
-#'
-#' dt_list = split_df(germancredit, y="creditability")
-#' train = dt_list$train
-#' test = dt_list$test
-#'
-#' @import data.table
-#' @export
 def split_df(dt, y=None, ratio=0.7, seed=186):
+    '''
+    Split a dataset
+    ------
+    Split a dataset into train and test
+    
+    Params
+    ------
+    dt: A data frame.
+    y: Name of y variable, default is NULL. The input data will split 
+        based on the predictor y, if it is provide.
+    ratio: A numeric value, default is 0.7. It indicates the ratio of 
+        total rows contained in one split, must less than 1.
+    seed: A random seed, default is 186.
+    
+    Returns
+    ------
+    dict
+        a dictionary of train and test
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # split train and test
+    train, test = sc.split_df(dat, 'creditability').values()
+    '''
+    
+    dt = dt.copy(deep=True)
     # remove date/time col
     dt = rm_datetime_col(dt)
     # replace "" by NA

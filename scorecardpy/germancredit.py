@@ -1,31 +1,37 @@
 # -*- coding: utf-8 -*-
 
-#' German Credit Data
-#'
-#' Credit data that classifies debtors described by
-#' a set of attributes as good or bad credit risks.
-#' See source link below for detailed information.
-#'
-#' @docType data
-#' @keywords data
-#' @name germancredit
-#' @usage data(germancredit)
-#' @format A data frame with 21 variables
-#' (numeric and factors) and 1000 observations.
-#' @source \url{https://archive.ics.uci.edu/ml/datasets/Statlog+(German+Credit+Data)}
-#' @examples
-#' # Load German credit data and create subset
-#' data(germancredit)
-#' df = germancredit[, c('creditability', 'credit.amount', 'duration.in.month',
-#'                   'savings.account.and.bonds', 'purpose')]
-#' # Display structure of the subset (data frame)
-#' str(df)
 import pandas as pd
 from pandas.api.types import CategoricalDtype
 import pkg_resources
 
 
 def germancredit():
+    '''
+    German Credit Data
+    ------
+    Credit data that classifies debtors described by a set of 
+    attributes as good or bad credit risks. See source link 
+    below for detailed information.
+    [source](https://archive.ics.uci.edu/ml/datasets/Statlog+(German+Credit+Data))
+    
+    Params
+    ------
+    
+    Returns
+    ------
+    DataFrame
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # # data structure
+    # dat.shape
+    # dat.dtypes
+    '''
     DATA_FILE = pkg_resources.resource_filename('scorecardpy', 'data/germancredit.csv')
     
     dat = pd.read_csv(DATA_FILE)
@@ -53,7 +59,6 @@ def germancredit():
     return dat
 
 
-# the dataset is modified from woebinning package
 '''
 # datasets
 dat1 = germancredit()

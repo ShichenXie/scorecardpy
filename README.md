@@ -57,7 +57,7 @@ X_test = test_woe.loc[:,train_woe.columns != 'creditability']
 
 # logistic regression ------
 from sklearn.linear_model import LogisticRegression
-lr = LogisticRegression(penalty='l1', C=0.9, solver='saga')
+lr = LogisticRegression(penalty='l1', C=0.9, solver='saga', njob=-1)
 lr.fit(X_train, y_train)
 # lr.coef_
 # lr.intercept_

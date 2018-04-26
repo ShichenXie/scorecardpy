@@ -59,7 +59,7 @@ def add_missing_spl_val(dtm, breaks, spl_val):
         if breaks is None:
             if spl_val is None:
                 spl_val=['missing']
-            elif any([('missing' in i) for i in spl_val]):
+            elif any([('missing' in str(i)) for i in spl_val]):
                 spl_val=spl_val
             else:
                 spl_val=['missing']+spl_val
@@ -152,7 +152,7 @@ def woebin2_breaks(dtm, breaks, spl_val):
     # binning
     if is_numeric_dtype(dtm['value']):
         # best breaks
-        bstbrks = ['-inf'] + list(set(bk_df.value.tolist()).difference(set([np.nan, '-inf', 'inf']))) + ['inf']
+        bstbrks = ['-inf'] + list(set(bk_df.value.tolist()).difference(set([np.nan, '-inf', 'inf', 'Inf', '-Inf']))) + ['inf']
         bstbrks = sorted(list(map(float, bstbrks)))
         # cut
         labels = ['[{},{})'.format(bstbrks[i], bstbrks[i+1]) for i in range(len(bstbrks)-1)]
@@ -682,80 +682,15 @@ def woebin2(y, x, x_name, breaks=None, spl_val=None,
     return binning_format(binning)
 
 
-#' WOE Binning
-#'
-#' \code{woebin} generates optimal binning for numerical, factor and categorical variables using methods including tree-like segmentation or chi-square merge. \code{woebin} can also customizing breakpoints if the breaks_list was provided.
-#'
-#' @name woebin
-#' @param dt A data frame with both x (predictor/feature) and y (response/label) variables.
-#' @param y Name of y variable.
-#' @param x Name of x variables. Default is NULL. If x is NULL, then all variables except y are counted as x variables.
-#' @param breaks_list List of break points, default is NULL. If it is not NULL, variable binning will based on the provided breaks.
-#' @param special_values the values specified in special_values will be in separate bins. Default is NULL.
-#' @param min_perc_fine_bin The minimum percentage of initial binning class number over total. Accepted range: 0.01-0.2; default is 0.02, which means initial binning into 50 fine bins for continuous variables.
-#' @param min_perc_coarse_bin The minimum percentage of final binning class number over total. Accepted range: 0.01-0.2; default is 0.05.
-#' @param stop_limit Stop binning segmentation when information value gain ratio less than the stop_limit, or stop binning merge when the minimum of chi-square less than 'qchisq(1-stoplimit, 1)'. Accepted range: 0-0.5; default is 0.1.
-#' @param max_num_bin Integer. The maximum number of binning.
-#' @param positive Value of positive class, default "bad|1".
-#' @param no_cores Number of CPU cores for parallel computation. Defaults NULL. If no_cores is NULL, the no_cores will set as 1 if length of x variables less than 10, and will set as the number of all CPU cores if the length of x variables greater than or equal to 10.
-#' @param print_step A non-negative integer. Default is 1. If print_step>0, print variable names by each print_step-th iteration. If print_step=0 or no_cores>1, no message is print.
-#' @param method Optimal binning method, it should be "tree" or "chimerge". Default is "tree".
-#' @return Optimal or customized binning information.
-#'
-#' @seealso \code{\link{woebin_ply}}, \code{\link{woebin_plot}}, \code{\link{woebin_adj}}
-#'
-#' @examples
-#' # load germancredit data
-#' data(germancredit)
-#'
-#' # Example I
-#' # binning of two variables in germancredit dataset
-#' bins_2var = woebin(germancredit, y = "creditability", x = c("credit.amount", "purpose"))
-#'
-#' \dontrun{
-#' # Example II
-#' # binning of the germancredit dataset
-#' bins_germ = woebin(germancredit, y = "creditability")
-#' # converting bins_germ into a dataframe
-#' # bins_germ_df = data.table::rbindlist(bins_germ)
-#'
-#' # Example III
-#' # customizing the breakpoints of binning
-#' library(data.table)
-#' dat = rbind(
-#'   germancredit,
-#'   data.table(creditability=sample(c("good","bad"),10,replace=TRUE)),
-#'   fill=TRUE)
-#'
-#' breaks_list = list(
-#'   age.in.years = c(26, 35, 37, "Inf%,%missing"),
-#'   housing = c("own", "for free%,%rent")
-#' )
-#'
-#' special_values = list(
-#'   credit.amount = c(2600, 9960, "6850%,%missing"),
-#'   purpose = c("education", "others%,%missing")
-#' )
-#'
-#' bins_cus_brk = woebin(dat, y="creditability",
-#'   x=c("age.in.years","credit.amount","housing","purpose"),
-#'   breaks_list=breaks_list, special_values=special_values)
-#'
-#' }
-#'
-#' @import data.table foreach
-#' @importFrom stats IQR quantile setNames
-#' @importFrom doParallel registerDoParallel stopImplicitCluster
-#' @importFrom parallel detectCores
-#' @export
-#'
+
 def woebin(dt, y, x=None, breaks_list=None, special_values=None, 
            min_perc_fine_bin=0.02, min_perc_coarse_bin=0.05, 
            stop_limit=0.1, max_num_bin=8, 
            positive="bad|1", no_cores=None, print_step=0, method="tree"):
     '''
-    woe binning
-    woebin generates optimal binning for numerical, factor and categorical variables 
+    WOE Binning
+    ------
+    `woebin` generates optimal binning for numerical, factor and categorical variables 
     using methods including tree-like segmentation or chi-square merge. 
     woebin can also customizing breakpoints if the breaks_list or special_values was provided.
     
@@ -796,10 +731,46 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     
     Returns
     ------
-    DataFrame
+    dictionary
         Optimal or customized binning dataframe.
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    import pandas as pd
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # Example I
+    # binning of two variables in germancredit dataset
+    bins_2var = sc.woebin(dat, y = "creditability", 
+      x = ["credit.amount", "purpose"])
+    
+    # Example II
+    # binning of the germancredit dataset
+    bins_germ = sc.woebin(dat, y = "creditability")
+    
+    # Example III
+    # customizing the breakpoints of binning
+    dat2 = pd.concat([dat, 
+      pd.DataFrame({'creditability':['good','bad']}).sample(50, replace=True)])
+    
+    breaks_list = {
+      'age.in.years': [26, 35, 37, "Inf%,%missing"],
+      'housing': ["own", "for free%,%rent"]
+    }
+    special_values = {
+      'credit.amount': [2600, 9960, "6850%,%missing"],
+      'purpose': ["education", "others%,%missing"]
+    }
+    
+    bins_cus_brk = sc.woebin(dat2, y="creditability",
+      x=["age.in.years","credit.amount","housing","purpose"],
+      breaks_list=breaks_list, special_values=special_values)
     '''
     
+    dt = dt.copy(deep=True)
     # remove date/time col
     dt = rm_datetime_col(dt)
     # replace "" by NA
@@ -911,7 +882,9 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
         # create bin column
         breaks_binx_other = np.unique(list(map(float, ['-inf']+[re.match(r'.*\[(.*),.+\).*', str(i)).group(1) for i in binx_other['bin']]+['inf'])))
         labels = ['[{},{})'.format(breaks_binx_other[i], breaks_binx_other[i+1]) for i in range(len(breaks_binx_other)-1)]
-        dtx.loc[:,'xi_bin'] = pd.cut(dtx[x_i], breaks_binx_other, right=False, labels=labels)
+        dtx = dtx.assign(xi_bin = lambda x: pd.cut(x[x_i], breaks_binx_other, right=False, labels=labels))
+        # dtx.loc[:,'xi_bin']
+        # dtx['xi_bin'] = pd.cut(dtx[x_i], breaks_binx_other, right=False, labels=labels)
         dtx.loc[:,'xi_bin'] = np.where(pd.isnull(dtx['xi_bin']), dtx['xi_bin'], dtx['xi_bin'].astype(str))
         #
         mask = dtx[x_i].isin(binx_sv['V1'])
@@ -931,57 +904,17 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
     return dtx_suffix
     
     
-#' WOE Transformation
-#'
-#' \code{woebin_ply} converts original input data into woe values based on the binning information generated from \code{woebin}.
-#'
-#' @param dt A data frame.
-#' @param bins Binning information generated from \code{woebin}.
-#' @param no_cores Number of CPU cores for parallel computation. Defaults NULL. If no_cores is NULL, the no_cores will set as 1 if length of x variables less than 10, and will set as the number of all CPU cores if the length of x variables greater than or equal to 10.
-#' @param print_step A non-negative integer. Default is 1. If print_step>0, print variable names by each print_step-th iteration. If print_step=0 or no_cores>1, no message is print.
-#' @return Binning information
-#'
-#' @seealso  \code{\link{woebin}}, \code{\link{woebin_plot}}, \code{\link{woebin_adj}}
-#'
-#' @examples
-#' # load germancredit data
-#' data(germancredit)
-#'
-#' # Example I
-#' dt = germancredit[, c("creditability", "credit.amount", "purpose")]
-#'
-#' # binning for dt
-#' bins = woebin(dt, y = "creditability")
-#'
-#' # converting original value to woe
-#' dt_woe = woebin_ply(dt, bins=bins)
-#'
-#' \dontrun{
-#' # Example II
-#' # binning for germancredit dataset
-#' bins_germancredit = woebin(germancredit, y="creditability")
-#'
-#' # converting the values in germancredit to woe
-#' # bins is a list which generated from woebin()
-#' germancredit_woe = woebin_ply(germancredit, bins_germancredit)
-#'
-#' # bins is a dataframe
-#' bins_df = data.table::rbindlist(bins_germancredit)
-#' germancredit_woe = woebin_ply(germancredit, bins_df)
-#' }
-#'
-#' @import data.table
-#' @export
-#'
 def woebin_ply(dt, bins, no_cores=None, print_step=0):
     '''
-    woebin_ply converts original input data into woe values 
-    based on the binning information generated from woebin.
+    WOE Transformation
+    ------
+    `woebin_ply` converts original input data into woe values 
+    based on the binning information generated from `woebin`.
     
     Params
     ------
     dt: A data frame.
-    bins: Binning information generated from \code{woebin}.
+    bins: Binning information generated from `woebin`.
     no_cores: Number of CPU cores for parallel computation. 
       Defaults NULL. If no_cores is NULL, the no_cores will 
       set as 1 if length of x variables less than 10, and will 
@@ -995,6 +928,32 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     -------
     DataFrame
         a dataframe of woe values for each variables 
+    
+    Examples
+    -------
+    import scorecardpy as sc
+    import pandas as pd
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # Example I
+    dt = dat[["creditability", "credit.amount", "purpose"]]
+    # binning for dt
+    bins = sc.woebin(dt, y = "creditability")
+    
+    # converting original value to woe
+    dt_woe = sc.woebin_ply(dt, bins=bins)
+    
+    # Example II
+    # binning for germancredit dataset
+    bins_germancredit = sc.woebin(dat, y="creditability")
+    
+    # converting the values in germancredit to woe
+    ## bins is a dict
+    germancredit_woe = sc.woebin_ply(dat, bins=bins_germancredit) 
+    ## bins is a dataframe
+    germancredit_woe = sc.woebin_ply(dat, bins=pd.concat(bins_germancredit))
     '''
     # remove date/time col
     dt = rm_datetime_col(dt)
@@ -1026,7 +985,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
             x_i = xs[i]
             # print xs
             # print(x_i)
-            if print_step>0 and bool((i+1)%print_step): 
+            if print_step>0 and bool((i+1) % print_step): 
                 print(('{:'+str(len(str(xs_len)))+'.0f}/{} {}').format(i, xs_len, x_i))
             #
             binx = bins[bins['variable'] == x_i].reset_index()
@@ -1109,53 +1068,16 @@ def plot_bin(binx, title, show_iv):
     return fig
 
 
-#' WOE Binning Visualization
-#'
-#' \code{woebin_plot} create plots of count distribution and bad probability for each bin. The binning informations are generates by  \code{woebin}.
-#'
-#' @name woebin_plot
-#' @param bins A list or data frame. Binning information generated by \code{woebin}.
-#' @param x Name of x variables. Default is NULL. If x is NULL, then all variables except y are counted as x variables.
-#' @param title String added to the plot title. Default is NULL.
-#' @param show_iv Logical. Default is TRUE, which means show information value in the plot title.
-#' @return List of binning plot
-#'
-#' @seealso  \code{\link{woebin}}, \code{\link{woebin_ply}}, \code{\link{woebin_adj}}
-#'
-#' @examples
-#' # Load German credit data
-#' data(germancredit)
-#'
-#' # Example I
-#' dt1 = germancredit[, c("creditability", "credit.amount")]
-#'
-#' bins1 = woebin(dt1, y="creditability")
-#' p1 = woebin_plot(bins1)
-#'
-#' \dontrun{
-#' # Example II
-#' bins = woebin(germancredit, y="creditability")
-#' plotlist = woebin_plot(bins)
-#'
-#' # # save binning plot
-#' # for (i in 1:length(plotlist)) {
-#' #   ggplot2::ggsave(
-#' #      paste0(names(plotlist[i]), ".png"), plotlist[[i]],
-#' #      width = 15, height = 9, units="cm" )
-#' #   }
-#' }
-#'
-#' @import data.table ggplot2
-#' @export
-#'
 def woebin_plot(bins, x=None, title=None, show_iv=True):
     '''
-    woebin_plot create plots of count distribution and bad probability 
-    for each bin. The binning informations are generates by woebin.
+    WOE Binning Visualization
+    ------
+    `woebin_plot` create plots of count distribution and bad probability 
+    for each bin. The binning informations are generates by `woebin`.
     
     Params
     ------
-    bins: A list or data frame. Binning information generated by woebin.
+    bins: A list or data frame. Binning information generated by `woebin`.
     x: Name of x variables. Default is NULL. If x is NULL, then all 
       variables except y are counted as x variables.
     title: String added to the plot title. Default is NULL.
@@ -1166,6 +1088,30 @@ def woebin_plot(bins, x=None, title=None, show_iv=True):
     ------
     dict
         a dict of matplotlib figure objests
+        
+    Examples
+    ------
+    import scorecardpy as sc
+    import matplotlib.pyplot as plt
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # Example I
+    dt1 = dat[["creditability", "credit.amount"]]
+    
+    bins1 = sc.woebin(dt1, y="creditability")
+    p1 = sc.woebin_plot(bins1)
+    plt.show(p1)
+    
+    # Example II
+    bins = sc.woebin(dat, y="creditability")
+    plotlist = sc.woebin_plot(bins)
+    
+    # # save binning plot
+    # for key,i in plotlist.items():
+    #     plt.show(i)
+    #     plt.savefig(str(key)+'.png')
     '''
     xs = x
     # bins concat 
@@ -1255,46 +1201,11 @@ def woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, special_values, method
     return breaks
     
     
-#' WOE Binning Adjustment
-#'
-#' \code{woebin_adj} interactively adjust the binning breaks.
-#'
-#' @param dt A data frame.
-#' @param y Name of y variable.
-#' @param bins A list or data frame. Binning information generated from \code{woebin}.
-#' @param adj_all_var Logical, default is TRUE. If it is TRUE, all variables need to adjust binning breaks, otherwise, only include the variables that have more then one inflection point.
-#' @param special_values the values specified in special_values will in separate bins. Default is NULL.
-#' @param method optimal binning method, it should be "tree" or "chimerge". Default is "tree".
-#'
-#' @seealso  \code{\link{woebin}}, \code{\link{woebin_ply}}, \code{\link{woebin_plot}}
-#'
-#' @examples
-#' \dontrun{
-#' # Load German credit data
-#' data(germancredit)
-#'
-#' # Example I
-#' dt = germancredit[, c("creditability", "age.in.years", "credit.amount")]
-#' bins = woebin(dt, y="creditability")
-#' breaks_adj = woebin_adj(dt, y="creditability", bins)
-#' bins_final = woebin(dt, y="creditability",
-#'                     breaks_list=breaks_adj)
-#'
-#' # Example II
-#' binsII = woebin(germancredit, y="creditability")
-#' breaks_adjII = woebin_adj(germancredit, "creditability", binsII)
-#' bins_finalII = woebin(germancredit, y="creditability",
-#'                     breaks_list=breaks_adjII)
-#' }
-#'
-#' @import data.table
-#' @importFrom utils menu
-#' @importFrom graphics hist plot
-#' @export
-#'
 def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"):
     '''
-    woebin_adj interactively adjust the binning breaks.
+    WOE Binning Adjustment
+    ------
+    `woebin_adj` interactively adjust the binning breaks.
     
     Params
     ------
@@ -1312,8 +1223,26 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
     Returns
     ------
     dict
-        break
+        dictionary of breaks
+        
+    Examples
+    ------
+    import scorecardpy as sc
     
+    # load data
+    dat = sc.germancredit()
+    
+    # Example I
+    dt = dat[["creditability", "age.in.years", "credit.amount"]]
+    
+    bins = sc.woebin(dt, y="creditability")
+    breaks_adj = sc.woebin_adj(dt, y="creditability", bins=bins)
+    bins_final = sc.woebin(dt, y="creditability", breaks_list=breaks_adj)
+    
+    # Example II
+    binsII = sc.woebin(dat, y="creditability")
+    breaks_adjII = sc.woebin_adj(dat, "creditability", binsII)
+    bins_finalII = sc.woebin(dat, y="creditability", breaks_list=breaks_adjII)
     '''
     # bins concat 
     if isinstance(bins, dict):

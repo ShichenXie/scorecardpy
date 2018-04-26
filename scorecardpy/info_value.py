@@ -4,30 +4,41 @@ import pandas as pd
 import numpy as np
 from .condition_fun import *
 
-#' Information Value
-#'
-#' This function calculates information value (IV) for multiple x variables.
-#'
-#' @param dt A data frame with both x (predictor/feature) and y (response/label) variables.
-#' @param y Name of y variable.
-#' @param x Name of x variables. Default is NULL. If x is NULL, then all variables except y are counted as x variables.
-#' @param positive Value of positive class, default is "bad|1".
-#' @param order Logical, default is TRUE. If it is TRUE, the output will descending order via iv.
-#'
-#' @return Information Value
-#' @details IV is a very useful concept for variable selection while developing credit scorecards. The formula for information value is shown below: \deqn{IV = \sum(DistributionBad_{i} - DistributionGood_{i})*\ln(\frac{DistributionBad_{i}}{DistributionGood_{i}}).} The log component in information value is defined as weight of evidence (WOE), which is shown as \deqn{WeightofEvidence = \ln(\frac{DistributionBad_{i}}{DistributionGood_{i}}).} The relationship between information value and predictive power is as follows: <0.02 (useless for prediction), 0.02 to 0.1 (Weak predictor), 0.1 to 0.3 (Medium predictor), 0.3 to 0.5 (Strong predictor) and >0.5 (Suspicious or too good to be true).
-#'
-#' @examples
-#' # Load German credit data
-#' data(germancredit)
-#'
-#' # information values
-#' dt_info_value = iv(germancredit, y = "creditability")
-#'
-#' @import data.table
-#' @export
-#'
+
 def iv(dt, y, x=None, positive='bad|1', order=True):
+    '''
+    Information Value
+    ------
+    This function calculates information value (IV) for multiple x variables.
+    
+    Params
+    ------
+    dt: A data frame with both x (predictor/feature) and 
+      y (response/label) variables.
+    y: Name of y variable.
+    x: Name of x variables. Default is NULL. If x is NULL, then 
+      all variables except y are counted as x variables.
+    positive: Value of positive class, default is "bad|1".
+    order: Logical, default is TRUE. If it is TRUE, the output 
+      will descending order via iv.
+    
+    Returns
+    ------
+    DataFrame
+        Information Value
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # information values
+    dt_info_value = sc.iv(dat, y = "creditability")
+    '''
+    
+    dt = dt.copy(deep=True)
     # remove date/time col
     dt = rm_datetime_col(dt)
     # replace "" by NA

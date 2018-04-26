@@ -52,10 +52,11 @@ def check_y(dat, y, positive):
     # remove na in y
     if pd.isna(dat[y]).any():
         warnings.warn("There are NaNs in \'{}\' column. The rows with NaN in \'{}\' were removed from dat.".format(y,y))
-        dat = dat[pd.notna(dat[y])]
+        dat = dat.dropna(subset=[y])
+        # dat = dat[pd.notna(dat[y])]
     
     # length of unique values in y
-    unique_y = np.unique(dat[y])
+    unique_y = np.unique(dat[y].values)
     if len(unique_y) == 2:
         if [v not in [0,1] for v in unique_y] == [True, True]:
             if True in [bool(re.search(positive, str(v))) for v in unique_y]:

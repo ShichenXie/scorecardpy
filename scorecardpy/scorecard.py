@@ -33,63 +33,67 @@ def ab(points0=600, odds0=1/60, pdo=50):
 
 
 
-#' Creating a Scorecard
-#'
-#' \code{scorecard} creates a scorecard based on the results from \code{woebin} and \code{glm}.
-#'
-#' @param bins Binning information generated from \code{woebin} function.
-#' @param model A glm model object.
-#' @param points0 Target points, default 600.
-#' @param odds0 Target odds, default 1/19. Odds = p/(1-p).
-#' @param pdo Points to Double the Odds, default 50.
-#' @param basepoints_eq0 Logical, default is FALSE. If it is TRUE, the basepoints will equally distribute to each variable.
-#' @return scorecard
-#'
-#' @seealso \code{\link{scorecard_ply}}
-#'
-#' @examples
-#' \dontrun{
-#' # load germancredit data
-#' data("germancredit")
-#'
-#' # filter variable via missing rate, iv, identical value rate
-#' dt_sel = var_filter(germancredit, "creditability")
-#'
-#' # woe binning ------
-#' bins = woebin(dt_sel, "creditability")
-#' dt_woe = woebin_ply(dt_sel, bins)
-#'
-#' # glm ------
-#' m = glm(creditability ~ ., family = binomial(), data = dt_woe)
-#' # summary(m)
-#'
-#' # Select a formula-based model by AIC
-#' m_step = step(m, direction="both", trace=FALSE)
-#' m = eval(m_step$call)
-#' # summary(m)
-#'
-#' # predicted proability
-#' # dt_pred = predict(m, type='response', dt_woe)
-#'
-#' # performace
-#' # ks & roc plot
-#' # perf_eva(dt_woe$creditability, dt_pred)
-#'
-#' # scorecard
-#' # Example I # creat a scorecard
-#' card = scorecard(bins, m)
-#'
-#' # credit score
-#' # Example I # only total score
-#' score1 = scorecard_ply(dt, card)
-#'
-#' # Example II # credit score for both total and each variable
-#' score2 = scorecard_ply(dt, card, only_total_score = F)
-#' }
-#' @import data.table
-#' @export
-#'
 def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints_eq0=False):
+    '''
+    Creating a Scorecard
+    ------
+    `scorecard` creates a scorecard based on the results from `woebin` 
+    and LogisticRegression of sklearn.linear_model
+    
+    Params
+    ------
+    bins: Binning information generated from `woebin` function.
+    model: A LogisticRegression model object.
+    points0: Target points, default 600.
+    odds0: Target odds, default 1/19. Odds = p/(1-p).
+    pdo: Points to Double the Odds, default 50.
+    basepoints_eq0: Logical, default is FALSE. If it is TRUE, the 
+      basepoints will equally distribute to each variable.
+    
+    Returns
+    ------
+    DataFrame
+        scorecard dataframe
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # filter variable via missing rate, iv, identical value rate
+    dt_sel = sc.var_filter(dat, "creditability")
+    
+    # woe binning ------
+    bins = sc.woebin(dt_sel, "creditability")
+    dt_woe = sc.woebin_ply(dt_sel, bins)
+    
+    y = dt_woe.loc[:,'creditability']
+    X = dt_woe.loc[:,dt_woe.columns != 'creditability']
+    
+    # logistic regression ------
+    from sklearn.linear_model import LogisticRegression
+    lr = LogisticRegression(penalty='l1', C=0.9, solver='saga')
+    lr.fit(X, y)
+    
+    # # predicted proability
+    # dt_pred = lr.predict_proba(X)[:,1]
+    # # performace
+    # # ks & roc plot
+    # sc.perf_eva(y, dt_pred)
+    
+    # scorecard
+    # Example I # creat a scorecard
+    card = sc.scorecard(bins, lr, X.columns)
+    
+    # credit score
+    # Example I # only total score
+    score1 = sc.scorecard_ply(dt_sel, card)
+    # Example II # credit score for both total and each variable
+    score2 = sc.scorecard_ply(dt_sel, card, only_total_score = False)
+    '''
+    
     # coefficients
     aabb = ab(points0, odds0, pdo)
     a, b = aabb.values()
@@ -123,61 +127,69 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
 
 
 
-#' Score Transformation
-#'
-#' \code{scorecard_ply} calculates credit score using the results from \code{scorecard}.
-#'
-#' @param dt Original data
-#' @param card Scorecard generated from \code{scorecard}.
-#' @param only_total_score  Logical, default is TRUE. If it is TRUE, then the output includes only total credit score; Otherwise, if it is FALSE, the output includes both total and each variable's credit score.
-#' @param print_step A non-negative integer. Default is 1. If print_step>0, print variable names by each print_step-th iteration. If print_step=0, no message is print.
-#' @return Credit score
-#'
-#' @seealso \code{\link{scorecard}}
-#'
-#' @examples
-#' \dontrun{
-#' # load germancredit data
-#' data("germancredit")
-#'
-#' # filter variable via missing rate, iv, identical value rate
-#' dt_sel = var_filter(germancredit, "creditability")
-#'
-#' # woe binning ------
-#' bins = woebin(dt_sel, "creditability")
-#' dt_woe = woebin_ply(dt_sel, bins)
-#'
-#' # glm ------
-#' m = glm(creditability ~ ., family = binomial(), data = dt_woe)
-#' # summary(m)
-#'
-#' # Select a formula-based model by AIC
-#' m_step = step(m, direction="both", trace=FALSE)
-#' m = eval(m_step$call)
-#' # summary(m)
-#'
-#' # predicted proability
-#' # dt_pred = predict(m, type='response', dt_woe)
-#'
-#' # performace
-#' # ks & roc plot
-#' # perf_eva(dt_woe$creditability, dt_pred)
-#'
-#' # scorecard
-#' # Example I # creat a scorecard
-#' card = scorecard(bins, m)
-#'
-#' # credit score
-#' # Example I # only total score
-#' score1 = scorecard_ply(dt, card)
-#'
-#' # Example II # credit score for both total and each variable
-#' score2 = scorecard_ply(dt, card, only_total_score = F)
-#' }
-#' @import data.table
-#' @export
-#'
 def scorecard_ply(dt, card, only_total_score=True, print_step=0):
+    '''
+    Score Transformation
+    ------
+    `scorecard_ply` calculates credit score using the results from `scorecard`.
+    
+    Params
+    ------
+    dt: Original data
+    card: Scorecard generated from `scorecard`.
+    only_total_score: Logical, default is TRUE. If it is TRUE, then 
+      the output includes only total credit score; Otherwise, if it 
+      is FALSE, the output includes both total and each variable's 
+      credit score.
+    print_step: A non-negative integer. Default is 1. If print_step>0, 
+      print variable names by each print_step-th iteration. If 
+      print_step=0, no message is print.
+    
+    Return
+    ------
+    DataFrame
+        Credit score
+    
+    Examples
+    ------
+    import scorecardpy as sc
+    
+    # load data
+    dat = sc.germancredit()
+    
+    # filter variable via missing rate, iv, identical value rate
+    dt_sel = sc.var_filter(dat, "creditability")
+    
+    # woe binning ------
+    bins = sc.woebin(dt_sel, "creditability")
+    dt_woe = sc.woebin_ply(dt_sel, bins)
+    
+    y = dt_woe.loc[:,'creditability']
+    X = dt_woe.loc[:,dt_woe.columns != 'creditability']
+    
+    # logistic regression ------
+    from sklearn.linear_model import LogisticRegression
+    lr = LogisticRegression(penalty='l1', C=0.9, solver='saga')
+    lr.fit(X, y)
+    
+    # # predicted proability
+    # dt_pred = lr.predict_proba(X)[:,1]
+    # # performace
+    # # ks & roc plot
+    # sc.perf_eva(y, dt_pred)
+    
+    # scorecard
+    # Example I # creat a scorecard
+    card = sc.scorecard(bins, lr, X.columns)
+    
+    # credit score
+    # Example I # only total score
+    score1 = sc.scorecard_ply(dt_sel, card)
+    # Example II # credit score for both total and each variable
+    score2 = sc.scorecard_ply(dt_sel, card, only_total_score = False)
+    '''
+  
+    dt = dt.copy(deep=True)
     # remove date/time col
     dt = rm_datetime_col(dt)
     # replace "" by NA
