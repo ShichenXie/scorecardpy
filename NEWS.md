@@ -1,3 +1,8 @@
+# scorecardpy 0.1.2.1
+
+* fixed the bug in woebin function when there are variables have only one unique value. 
+
+
 # scorecard 0.1.7
 
 * added chimerge method for woe binning

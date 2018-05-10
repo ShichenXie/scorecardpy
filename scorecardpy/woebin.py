@@ -379,7 +379,10 @@ def woebin2_tree_add_1brkp(dtm, initial_binning, min_perc_coarse_bin, bestbreaks
         return total_iv_all_brks
     # binning add 1best break
     def binning_add_1bst(initial_binning, bestbreaks):
-        bestbreaks_inf = [float('-inf')]+sorted(bestbreaks)+[float('inf')]
+        if bestbreaks is None:
+            bestbreaks_inf = [float('-inf'),float('inf')]
+        else:
+            bestbreaks_inf = [float('-inf')]+sorted(bestbreaks)+[float('inf')]
         labels = ['[{},{})'.format(bestbreaks_inf[i], bestbreaks_inf[i+1]) for i in range(len(bestbreaks_inf)-1)]
         binning_1bst_brk = initial_binning.assign(
           bstbin = lambda x: pd.cut(x['brkp'], bestbreaks_inf, right=False, labels=labels)
@@ -443,6 +446,8 @@ def woebin2_tree(dtm, min_perc_fine_bin=0.02, min_perc_coarse_bin=0.05,
     bin_list = woebin2_init_bin(dtm, min_perc_fine_bin=min_perc_fine_bin, breaks=breaks, spl_val=spl_val)
     initial_binning = bin_list['initial_binning']
     binning_sv = bin_list['binning_sv']
+    if len(initial_binning.index)==1: 
+        return {'binning_sv':binning_sv, 'binning':initial_binning}
     # initialize parameters
     len_brks = len(initial_binning.index)
     bestbreaks = None
@@ -821,7 +826,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
             # print(x_i)
             # print xs
             if print_step>0 and bool((i+1)%print_step): 
-                print(('{:'+str(len(str(xs_len)))+'.0f}/{} {}').format(i, xs_len, x_i))
+                print(('{:'+str(len(str(xs_len)))+'.0f}/{} {}').format(i, xs_len, x_i), flush=True)
             # woebining on one variable
             bins[x_i] = woebin2(
               y=dt[y], x=dt[x_i], x_name=x_i,
@@ -986,7 +991,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
             # print xs
             # print(x_i)
             if print_step>0 and bool((i+1) % print_step): 
-                print(('{:'+str(len(str(xs_len)))+'.0f}/{} {}').format(i, xs_len, x_i))
+                print(('{:'+str(len(str(xs_len)))+'.0f}/{} {}').format(i, xs_len, x_i), flush=True)
             #
             binx = bins[bins['variable'] == x_i].reset_index()
                  # bins.loc[lambda x: x.variable == x_i] 
