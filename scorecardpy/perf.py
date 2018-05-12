@@ -319,7 +319,7 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
     
 
 
-def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50, show_plot=True, seed=186, return_distr_dat=False):
+def perf_psi(score, label=None, title=None, x_limits=None, x_tick_break=50, show_plot=True, seed=186, return_distr_dat=False):
     '''
     PSI
     ------
@@ -337,7 +337,7 @@ def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50,
       dataframes. The label values should be 0s and 1s, 0 represent for 
       good and 1 for bad.
     title: Title of plot, default is NULL.
-    x_limits: x-axis limits, default is c(100, 800).
+    x_limits: x-axis limits, default is None.
     x_tick_break: x-axis ticker break, default is 50.
     show_plot: Logical, default is TRUE. It means whether to show plot.
     return_distr_dat: Logical, default is FALSE.
@@ -484,6 +484,11 @@ def perf_psi(score, label=None, title=None, x_limits=[100,800], x_tick_break=50,
         dat = dt_sl[['ae', 'y', sn]]
         if len(dt_sl[sn].unique()) > 10:
             # breakpoints
+            if x_limits is None:
+                x_limits = dat[sn].quantile([0.02, 0.98])
+                x_limits = round(x_limits/x_tick_break)*x_tick_break
+                x_limits = [i for i in x_limits]
+        
             brkp = np.unique([np.floor(min(dt_sl[sn])/x_tick_break)*x_tick_break]+\
               list(np.arange(x_limits[0]+x_tick_break, x_limits[1]-x_tick_break, x_tick_break))+\
               [np.ceil(max(dt_sl[sn])/x_tick_break)*x_tick_break])
