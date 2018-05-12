@@ -84,8 +84,6 @@ test_score = sc.scorecard_ply(test, card, print_step=0)
 # psi
 sc.perf_psi(
   score = {'train':train_score, 'test':test_score},
-  label = {'train':y_train, 'test':y_test},
-  x_limits = [250, 750],
-  x_tick_break = 50
+  label = {'train':y_train, 'test':y_test}
 )
 ```
