@@ -9,9 +9,14 @@ This package is python version of R package [scorecard](https://github.com/Shich
 
 ## Installation
 
-Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
+1. Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
 ```
 pip install scorecardpy
+```
+
+2. Install the latest version of `scorecardpy` from [github](https://github.com/shichenxie/scorecardpy) with:
+```
+pip install git+git://github.com/shichenxie/scorecardpy.git
 ```
 
 ## Example

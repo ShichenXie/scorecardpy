@@ -8,6 +8,7 @@ import re
 import warnings
 import multiprocessing as mp
 import matplotlib.pyplot as plt
+import time
 from .condition_fun import *
 from .info_value import *
 
@@ -774,10 +775,12 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
       x=["age.in.years","credit.amount","housing","purpose"],
       breaks_list=breaks_list, special_values=special_values)
     '''
+    # start time
+    start_time = time.time()
     
     dt = dt.copy(deep=True)
     # remove date/time col
-    dt = rm_datetime_col(dt)
+    dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # check y
@@ -853,6 +856,12 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
         # bins in dictionary
         bins = dict(zip(xs, pool.starmap(woebin2, args)))
         pool.close()
+    
+    # runingtime
+    runingtime = time.time() - start_time
+    if (runingtime >= 30):
+        print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
+        # print('Binning {} rows and {} columns in {}'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime))))
     # return
     return bins
 
@@ -961,7 +970,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     germancredit_woe = sc.woebin_ply(dat, bins=pd.concat(bins_germancredit))
     '''
     # remove date/time col
-    dt = rm_datetime_col(dt)
+    dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # ncol of dt

@@ -39,7 +39,7 @@ def split_df(dt, y=None, ratio=0.7, seed=186):
     
     dt = dt.copy(deep=True)
     # remove date/time col
-    dt = rm_datetime_col(dt)
+    dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # set ratio range

@@ -40,7 +40,7 @@ from .condition_fun import *
 # Information Entropy
 def ie(dt, y='creditability', x=None, order=True):
     # remove date/time col
-    dt = rm_datetime_col(dat)
+    dt = rmcol_datetime_unique1(dat)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # check y
@@ -146,7 +146,7 @@ def ie_01(good, bad):
 # impurity gini
 def ig(dt, y, x=None, order=True):
     # remove date/time col
-    dt = rm_datetime_col(dat)
+    dt = rmcol_datetime_unique1(dat)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # check y
@@ -172,7 +172,7 @@ ig = function(dt, y, x=NULL, order=TRUE) {
   # set dt as data.table
   dt = setDT(dt)
   # remove date/time col
-  dt = rm_datetime_col(dt)
+  dt = rmcol_datetime_unique1(dt)
   # replace "" by NA
   dt = rep_blank_na(dt)
   # check y

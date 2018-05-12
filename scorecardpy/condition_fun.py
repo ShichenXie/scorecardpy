@@ -5,14 +5,14 @@ import numpy as np
 import warnings
 import re
 
-# remove date time columns
+# remove date time columns # rm_datetime_col
 # remove columns if len(x.unique()) == 1
-def rm_datetime_col(dat): # add more datatime types later
-    # remove only NaN variable 
-    unique_is1_cols = [i for i in list(dat) if len(dat[i].unique())==1]
-    if len(unique_is1_cols) > 0:
-        warnings.warn("There are {} columns have only one unique values, which are removed from input dataset. \n (ColumnNames: {})".format(len(unique_is1_cols), ', '.join(unique_is1_cols)))
-        dat=dat.drop(unique_is1_cols, axis=1)
+def rmcol_datetime_unique1(dat): # add more datatime types later
+    # remove only 1 unique vlaues variable 
+    unique1_cols = [i for i in list(dat) if len(dat[i].unique())==1]
+    if len(unique1_cols) > 0:
+        warnings.warn("There are {} columns have only one unique values, which are removed from input dataset. \n (ColumnNames: {})".format(len(unique1_cols), ', '.join(unique1_cols)))
+        dat=dat.drop(unique1_cols, axis=1)
     
     # remove date time variable
     datetime_cols = dat.dtypes[dat.dtypes == 'datetime64[ns]'].index.tolist()
