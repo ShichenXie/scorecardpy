@@ -1,7 +1,8 @@
-# scorecardpy 0.1.2.1
+# scorecardpy 0.1.3
 
 * fixed the bug in woebin function when there are variables have only one unique value. 
-
+* modify the default values of x_limits in perf_psi
+* display proc time in woebin
 
 # scorecard 0.1.7
 
