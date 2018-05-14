@@ -61,10 +61,15 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95, identical_limit
     x = x_variable(dt,y,x)
     
     # force removed variables
-    if var_rm is not None: x = list(set(x).difference(set(var_rm)))
+    if var_rm is not None: 
+        if isinstance(var_rm, str):
+            var_rm = [var_rm]
+        x = list(set(x).difference(set(var_rm)))
     # check force kept variables
     if var_kp is not None:
-        var_kp2 = set(var_kp) & set(x)
+        if isinstance(var_kp, str):
+            var_kp = [var_kp]
+        var_kp2 = list(set(var_kp) & set(x))
         len_diff_var_kp = len(var_kp) - len(var_kp2)
         if len_diff_var_kp > 0:
             warnings.warn("Incorrect inputs; there are {} var_kp variables are not exist in input data, which are removed from var_kp. \n {}".format(len_diff, list(set(var_kp)-set(var_kp2))) )
@@ -87,7 +92,8 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95, identical_limit
     
     # add kept variable
     x_selected = dt_var_sel.variable.tolist()
-    if var_kp is not None: x_selected = np.unique(x_selected+var_kp).tolist()
+    if var_kp is not None: 
+        x_selected = np.unique(x_selected+var_kp).tolist()
     # data kept
     dt_kp = dt[x_selected+[y]]
     

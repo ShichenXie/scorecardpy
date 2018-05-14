@@ -1,3 +1,7 @@
+# scorecardpy 0.1.3.1
+
+* fixed a bug in var_filter function when the type of var_rm/var_kp is str
+
 # scorecardpy 0.1.3
 
 * fixed the bug in woebin function when there are variables have only one unique value. 
