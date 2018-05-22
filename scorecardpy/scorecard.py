@@ -224,7 +224,7 @@ def scorecard_ply(dt, card, only_total_score=True, print_step=0):
     # total score
     dat_score = dat[xs+'_points']
     dat_score.loc[:,'score'] = card_basepoints + dat_score.sum(axis=1)
-    dat_score = dat_score.assign(score = lambda x: card_basepoints + dat_score.sum(axis=1))
+    # dat_score = dat_score.assign(score = lambda x: card_basepoints + dat_score.sum(axis=1))
     # return
     if only_total_score: dat_score = dat_score[['score']]
     return dat_score

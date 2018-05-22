@@ -485,7 +485,7 @@ def perf_psi(score, label=None, title=None, x_limits=None, x_tick_break=50, show
         if len(dt_sl[sn].unique()) > 10:
             # breakpoints
             if x_limits is None:
-                x_limits = dat[sn].quantile([0.05, 0.95])
+                x_limits = dat[sn].quantile([0.02, 0.98])
                 x_limits = round(x_limits/x_tick_break)*x_tick_break
                 x_limits = list(x_limits)
         

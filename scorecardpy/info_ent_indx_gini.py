@@ -165,37 +165,6 @@ def ig(dt, y, x=None, order=True):
     return iglist
     
     
-
-ig = function(dt, y, x=NULL, order=TRUE) {
-  gini_impurity = label = NULL
-
-  # set dt as data.table
-  dt = setDT(dt)
-  # remove date/time col
-  dt = rmcol_datetime_unique1(dt)
-  # replace "" by NA
-  dt = rep_blank_na(dt)
-  # check y
-  # dt = check_y(dt, y, positive)
-  # x variable names
-  x = x_variable(dt, y, x)
-
-  # data prep
-  dt = dt[
-    , x, with = FALSE
-    ][, `:=`(
-      rowid = .I, label = dt[[y]]
-    )]
-
-  # index gini
-  gini_vec = dt[, sapply(.SD, ig_xy, label), .SDcols = x]
-
-  gini_df = data.table(variable=names(gini_vec), gini_impurity=gini_vec)
-  if (order) gini_df = gini_df[order(-gini_impurity)]
-
-  return(gini_df)
-}
-
 #' @import data.table
 def ig_xy(x, y):
     # if x is None: x=0

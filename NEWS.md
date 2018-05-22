@@ -1,6 +1,8 @@
-# scorecardpy 0.1.3.1
+# scorecardpy 0.1.3.2
 
 * fixed a bug in var_filter function when the type of var_rm/var_kp is str
+* exported two functions information entropy (ie) and impurity gini(ig)
+* fixed a bug in scorecard_ply function calculates the total score double. 
 
 # scorecardpy 0.1.3
 
