@@ -73,7 +73,7 @@ y = dat1['creditability']
 
 # x
 # numerical data
-xvar =  'age.in.years' #'number.of.existing.credits.at.this.bank' # "credit.amount" # "foreign.worker 
+xvar =  "credit.amount" # "foreign.worker # 'age.in.years' #'number.of.existing.credits.at.this.bank' # 
 x= dat1[xvar]
 spl_val = [2600, 9960, "6850%,%missing"]
 breaks = [2000, 4000, 6000]

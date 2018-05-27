@@ -538,7 +538,7 @@ def perf_psi(score, label=None, title=None, x_limits=None, x_tick_break=50, show
             # ax2.set_yticks(np.arange(0, 1+0.2, 0.2))
             ax1.set_ylim([0,np.ceil(np.nanmax(distr_prob['distr'].values)*10)/10])
             ax2.set_ylim([0,1])
-            plt.xticks(ind, distr_prob.index)
+            plt.xticks(ind+width/2, distr_prob.index)
             plt.title(title_string, loc='left')
             ax1.legend((p1[0], p2[0]), list(distr_prob.columns.levels[1]), loc='upper left')
             ax2.legend((p3[0], p4[0]), list(distr_prob.columns.levels[1]), loc='upper right')

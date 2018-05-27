@@ -170,7 +170,7 @@ def woebin2_breaks(dtm, breaks, spl_val):
             dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
             warnings.warn("The break points are modified into '[{}]'. There are empty bins based on the provided break points.".format(','.join(binright)))
         # binning
-        dtm['bin'] = dtm['bin'].astype(str)
+        # dtm['bin'] = dtm['bin'].astype(str)
         binning = dtm.groupby(['variable','bin'])['y'].agg([n0, n1])\
           .reset_index().rename(columns={'n0':'good','n1':'bad'})
         # merge binning and bk_df if nan isin value
