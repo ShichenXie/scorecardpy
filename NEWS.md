@@ -1,3 +1,7 @@
+# scorecardpy 0.1.4.1
+
+* fixed a bug in woebin_ply function when spl_val is specified.
+
 # scorecardpy 0.1.4
 
 * fixed a bug in var_filter function when the type of var_rm/var_kp is str

@@ -103,7 +103,9 @@ def dtm_binning_sv(dtm, breaks, spl_val):
         sv_df = split_vec_todf(spl_val)
         # value 
         if is_numeric_dtype(dtm['value']):
-            sv_df = sv_df.assign(value = lambda x: x.value.astype(dtm['value'].dtypes))
+            sv_df['bin_chr'] = sv_df['bin_chr'].astype(dtm['value'].dtypes).astype(str)
+            sv_df['value'] = sv_df['value'].astype(dtm['value'].dtypes)
+            # sv_df = sv_df.assign(value = lambda x: x.value.astype(dtm['value'].dtypes))
         # dtm_sv & dtm
         dtm_sv = pd.merge(dtm, sv_df[['value']], how='inner', on='value', right_index=True)
         dtm = dtm[~dtm.index.isin(dtm_sv.index)].reset_index() if len(dtm_sv.index) < len(dtm.index) else None
@@ -891,22 +893,24 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
     # dtx
     ## cut numeric variable
     if is_numeric_dtype(dtx[x_i]):
-        binx_sv = binx.loc[lambda x: [not bool(re.search(r'\[', str(i))) for i in x.V1]]
-        binx_other = binx.loc[lambda x: [bool(re.search(r'\[', str(i))) for i in x.V1]]
+        is_sv = pd.Series(not bool(re.search(r'\[', str(i))) for i in binx.V1)
+        binx_sv = binx.loc[is_sv]
+        binx_other = binx.loc[~is_sv]
         # create bin column
         breaks_binx_other = np.unique(list(map(float, ['-inf']+[re.match(r'.*\[(.*),.+\).*', str(i)).group(1) for i in binx_other['bin']]+['inf'])))
         labels = ['[{},{})'.format(breaks_binx_other[i], breaks_binx_other[i+1]) for i in range(len(breaks_binx_other)-1)]
+        
         dtx = dtx.assign(xi_bin = lambda x: pd.cut(x[x_i], breaks_binx_other, right=False, labels=labels))\
           .assign(xi_bin = lambda x: [i if (i != i) else str(i) for i in x['xi_bin']])
         # dtx.loc[:,'xi_bin'] = pd.cut(dtx[x_i], breaks_binx_other, right=False, labels=labels)
         # dtx.loc[:,'xi_bin'] = np.where(pd.isnull(dtx['xi_bin']), dtx['xi_bin'], dtx['xi_bin'].astype(str))
         #
         mask = dtx[x_i].isin(binx_sv['V1'])
-        dtx.loc[mask,'xi_bin'] = dtx.loc[mask, x_i]
+        dtx.loc[mask,'xi_bin'] = dtx.loc[mask, x_i].astype(str)
         dtx = dtx[['xi_bin']].rename(columns={'xi_bin':x_i})
     ## to charcarter, na to missing
     if not is_string_dtype(dtx[x_i]):
-        dtx.loc[:,x_i] = dtx[x_i].astype(str).replace('nan', 'missing')
+        dtx.loc[:,x_i] = dtx.loc[:,x_i].astype(str).replace('nan', 'missing')
     # dtx.loc[:,x_i] = np.where(pd.isnull(dtx[x_i]), dtx[x_i], dtx[x_i].astype(str))
     # dtx = dtx.replace(np.nan, 'missing').assign(rowid = dtx.index)
     dtx = dtx.fillna('missing').assign(rowid = dtx.index)
