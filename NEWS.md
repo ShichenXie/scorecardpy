@@ -1,6 +1,7 @@
-# scorecardpy 0.1.4.1
+# scorecardpy 0.1.4.2
 
 * fixed a bug in woebin_ply function when spl_val is specified.
+* fixed a bug in woebin function when there are NaNs in input dataframe.
 
 # scorecardpy 0.1.4
 

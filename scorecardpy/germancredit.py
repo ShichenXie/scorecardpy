@@ -69,7 +69,7 @@ dat = pd.concat([dat2, dat1], ignore_index=True)
 
 ###### dtm ######
 # y
-y = dat1['creditability']
+y = dat['creditability']
 
 # x
 # numerical data
@@ -81,7 +81,7 @@ breaks = ['26%,%missing', 28, 35, 37]
 
 # categorical data
 xvar= 'purpose'#'housing' # "job" # "credit.amount"; #
-x= dat1[xvar] # pd.Categorical(dat[xvar], categories=['rent', 'own','for free']) 
+x= dat[xvar] # pd.Categorical(dat[xvar], categories=['rent', 'own','for free']) 
 breaks = ["own", "for free%,%rent%,%missing"]
 breaks = ["own", "for free%,%rent"]
 

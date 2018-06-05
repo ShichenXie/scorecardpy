@@ -103,8 +103,11 @@ def dtm_binning_sv(dtm, breaks, spl_val):
         sv_df = split_vec_todf(spl_val)
         # value 
         if is_numeric_dtype(dtm['value']):
-            sv_df['bin_chr'] = sv_df['bin_chr'].astype(dtm['value'].dtypes).astype(str)
             sv_df['value'] = sv_df['value'].astype(dtm['value'].dtypes)
+            # sv_df['bin_chr'] = sv_df['bin_chr'].astype(dtm['value'].dtypes).astype(str)
+            sv_df['bin_chr'] = np.where(
+              np.isnan(sv_df['value']), sv_df['bin_chr'], 
+              sv_df['value'].astype(dtm['value'].dtypes).astype(str))
             # sv_df = sv_df.assign(value = lambda x: x.value.astype(dtm['value'].dtypes))
         # dtm_sv & dtm
         dtm_sv = pd.merge(dtm, sv_df[['value']], how='inner', on='value', right_index=True)
