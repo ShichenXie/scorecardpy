@@ -100,6 +100,9 @@ def eva_dfrocpr(df):
     return dfrocpr
 # plot roc
 def eva_proc(dfrocpr, title):
+    dfrocpr = pd.concat(
+      [dfrocpr[['FPR','TPR']], pd.DataFrame({'FPR':[0,1], 'TPR':[0,1]})], 
+      ignore_index=True).sort_values(['FPR','TPR'])
     auc = dfrocpr.sort_values(['FPR','TPR'])\
           .assign(
             TPR_lag=lambda x: x['TPR'].shift(1), FPR_lag=lambda x: x['FPR'].shift(1)
@@ -292,7 +295,9 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
         rt['KS'] = round(dfkslift.loc[lambda x: x.ks==max(x.ks),'ks'].iloc[0],4)
     # plot, ROC ------
     if 'roc' in plot_type:
-        auc = dfrocpr.sort_values(['FPR','TPR'])\
+        auc = pd.concat(
+          [dfrocpr[['FPR','TPR']], pd.DataFrame({'FPR':[0,1], 'TPR':[0,1]})], 
+          ignore_index=True).sort_values(['FPR','TPR'])\
           .assign(
             TPR_lag=lambda x: x['TPR'].shift(1), FPR_lag=lambda x: x['FPR'].shift(1)
           ).assign(
