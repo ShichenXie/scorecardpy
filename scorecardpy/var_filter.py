@@ -2,6 +2,7 @@
 
 import pandas as pd
 import warnings
+import time
 from .condition_fun import *
 from .info_value import *
 
@@ -49,6 +50,8 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95, identical_limit
     # variable filter
     dt_sel = sc.var_filter(dat, y = "creditability")
     '''
+    # start time
+    start_time = time.time()
     
     dt = dt.copy(deep=True)
     # remove date/time col
@@ -97,6 +100,11 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95, identical_limit
     # data kept
     dt_kp = dt[x_selected+[y]]
     
+    # runingtime
+    runingtime = time.time() - start_time
+    if (runingtime >= 10):
+        # print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
+        print('Variable filtering on {} rows and {} columns in {} \n{} variables are removed'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime)), dt.shape[1]-len(x_selected+[y])))
     # return remove reason
     if return_rm_reason:
         dt_var_rm = dt_var_selector.query('(info_value < {}) | (missingrate > {}) | (identicalrate > {})'.format(iv_limit,missing_limit,identical_limit)) \

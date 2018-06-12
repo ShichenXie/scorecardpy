@@ -124,11 +124,16 @@ def check_breaks_list(breaks_list, xs):
 # check special_values
 def check_special_values(special_values, xs):
     if special_values is not None:
-        # is string
-        if isinstance(special_values, str):
-            special_values = eval(special_values)
-        # is not dict
-        if not isinstance(special_values, dict): 
-            raise Exception("Incorrect inputs; special_values should be a dict.")
+        # # is string
+        # if isinstance(special_values, str):
+        #     special_values = eval(special_values)
+        if isinstance(special_values, list):
+            warnings.warn("The special_values should be a dict. Make sure special values are exactly the same in all variables if special_values is a list.")
+            sv_dict = {}
+            for i in xs:
+                sv_dict[i] = special_values
+            special_values = sv_dict
+        elif not isinstance(special_values, dict): 
+            raise Exception("Incorrect inputs; special_values should be a list or dict.")
     return special_values
 

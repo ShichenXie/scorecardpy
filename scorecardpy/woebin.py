@@ -114,6 +114,9 @@ def dtm_binning_sv(dtm, breaks, spl_val):
         dtm = dtm[~dtm.index.isin(dtm_sv.index)].reset_index() if len(dtm_sv.index) < len(dtm.index) else None
         # dtm_sv = dtm.query('value in {}'.format(sv_df['value'].tolist()))
         # dtm    = dtm.query('value not in {}'.format(sv_df['value'].tolist()))
+        
+        if dtm_sv.shape[0] == 0:
+            return {'binning_sv':None, 'dtm':dtm}
         # binning_sv
         binning_sv = pd.merge(
           dtm_sv.fillna('missing').groupby(['variable','value'])['y'].agg([n0, n1])\
@@ -864,9 +867,9 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     
     # runingtime
     runingtime = time.time() - start_time
-    if (runingtime >= 30):
-        print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
-        # print('Binning {} rows and {} columns in {}'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime))))
+    if (runingtime >= 10):
+        # print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
+        print('Binning on {} rows and {} columns in {}'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime))))
     # return
     return bins
 
@@ -976,6 +979,8 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     ## bins is a dataframe
     germancredit_woe = sc.woebin_ply(dat, bins=pd.concat(bins_germancredit))
     '''
+    # start time
+    start_time = time.time()
     # remove date/time col
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
@@ -1028,6 +1033,11 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
         dat_suffix = pool.starmap(woepoints_ply1, args)
         dat = pd.concat([dat]+dat_suffix, axis=1)
         pool.close()
+    # runingtime
+    runingtime = time.time() - start_time
+    if (runingtime >= 10):
+        # print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
+        print('Woe transformating on {} rows and {} columns in {}'.format(dt.shape[0], xs_len, time.strftime("%H:%M:%S", time.gmtime(runingtime))))
     return dat
 
 
@@ -1193,7 +1203,7 @@ def woebin_adj_print_basic_info(i, xs, bins, dt, bins_breakslist):
     
     
 # plot adjusted binning in woebin_adj
-def woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, special_values, method):
+def woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, sv_i, method):
     '''
     update breaks and provies a binning plot
     
@@ -1207,6 +1217,7 @@ def woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, special_values, method
     if breaks == '':
         breaks = None
     breaks_list = None if breaks is None else {x_i: eval('['+breaks+']')}
+    special_values = None if sv_i is None else {x_i: sv_i}
     # binx update
     bins_adj = woebin(dt[[x_i,y]], y, breaks_list=breaks_list, special_values=special_values, stop_limit = stop_limit, method=method)
     
@@ -1282,6 +1293,8 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
         xs_adj = xs_all
     # length of adjusting variables
     xs_len = len(xs_adj)
+    # special_values
+    special_values = check_special_values(special_values, xs_adj)
     # dtypes of  variables
     vars_class = pd.DataFrame({
       'variable': [i for i in dt.columns],
@@ -1315,6 +1328,9 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
     while i <= xs_len:
         # x_i
         x_i = xs_adj[i-1]
+        sv_i = special_values[x_i] if (special_values is not None) and (x_i in special_values.keys()) else None
+        # if sv_i is not None:
+        #     sv_i = ','.join('\'')
         # basic information of x_i variable ------
         woebin_adj_print_basic_info(i, xs_adj, bins, dt, bins_breakslist)
         # adjusting breaks ------
@@ -1330,7 +1346,7 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
                 breaks = None
             else:
                 stop_limit = 0.1
-            breaks = woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, special_values, method=method)
+            breaks = woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, sv_i, method=method)
             # adj breaks again
             adj_brk = menu(i, xs_len, x_i)
         if adj_brk == 3:

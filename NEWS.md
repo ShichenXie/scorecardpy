@@ -3,6 +3,7 @@
 * fixed a bug in woebin_ply function when spl_val is specified.
 * fixed a bug in woebin function when there are NaNs in input dataframe.
 * fixed a bug in perf_eva when calculating auc.
+* fixed a bug in woebin_adj when special_values is provided.
 
 # scorecardpy 0.1.4
 
