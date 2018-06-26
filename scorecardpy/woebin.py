@@ -131,6 +131,25 @@ def dtm_binning_sv(dtm, breaks, spl_val):
     # return
     return {'binning_sv':binning_sv, 'dtm':dtm}
     
+# check empty bins for unmeric variable
+def check_empty_bins(dtm, binning):
+    # check empty bins
+    bin_list = binning.bin.astype(str)
+    if 'nan' in bin_list: 
+        bin_list.remove('nan')
+    binleft = set([re.match(r'\[(.+),(.+)\)', i).group(1) for i in bin_list]).difference(set(['-inf', 'inf']))
+    binright = set([re.match(r'\[(.+),(.+)\)', i).group(2) for i in bin_list]).difference(set(['-inf', 'inf']))
+    if binleft != binright:
+        bstbrks = sorted(list(map(float, ['-inf'] + list(binright) + ['inf'])))
+        labels = ['[{},{})'.format(bstbrks[i], bstbrks[i+1]) for i in range(len(bstbrks)-1)]
+        dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
+        binning = dtm.groupby(['variable','bin'])['y'].agg([n0, n1])\
+          .reset_index().rename(columns={'n0':'good','n1':'bad'})
+        # warnings.warn("The break points are modified into '[{}]'. There are empty bins based on the provided break points.".format(','.join(binright)))
+        # binning
+        # dtm['bin'] = dtm['bin'].astype(str)
+    # return
+    return binning
 
 # required in woebin2 # return binning if breaks provided
 #' @import data.table
@@ -166,21 +185,11 @@ def woebin2_breaks(dtm, breaks, spl_val):
         # cut
         labels = ['[{},{})'.format(bstbrks[i], bstbrks[i+1]) for i in range(len(bstbrks)-1)]
         dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
-        # check empty bins
-        bin_list = np.unique(dtm.bin.astype(str)).tolist()
-        if 'nan' in bin_list: 
-            bin_list.remove('nan')
-        binleft = set([re.match(r'\[(.+),(.+)\)', i).group(1) for i in bin_list]).difference(set(['-inf', 'inf']))
-        binright = set([re.match(r'\[(.+),(.+)\)', i).group(2) for i in bin_list]).difference(set(['-inf', 'inf']))
-        if binleft != binright:
-            bstbrks = sorted(list(map(float, ['-inf'] + list(binright) + ['inf'])))
-            labels = ['[{},{})'.format(bstbrks[i], bstbrks[i+1]) for i in range(len(bstbrks)-1)]
-            dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
-            warnings.warn("The break points are modified into '[{}]'. There are empty bins based on the provided break points.".format(','.join(binright)))
-        # binning
-        # dtm['bin'] = dtm['bin'].astype(str)
         binning = dtm.groupby(['variable','bin'])['y'].agg([n0, n1])\
           .reset_index().rename(columns={'n0':'good','n1':'bad'})
+        # check empty bins for unmeric variable
+        binning = check_empty_bins(dtm, binning)
+        
         # merge binning and bk_df if nan isin value
         if bk_df['value'].isnull().any():
             binning = pd.merge(
@@ -282,8 +291,11 @@ def woebin2_init_bin(dtm, min_perc_fine_bin, breaks, spl_val):
         dtm.loc[:,'bin'] = pd.cut(dtm['value'], brk, right=False, labels=labels)#.astype(str)
         # init_bin
         init_bin = dtm.groupby('bin')['y'].agg([n0, n1])\
-        .reset_index().rename(columns={'n0':'good','n1':'bad'})\
-        .assign(
+        .reset_index().rename(columns={'n0':'good','n1':'bad'})
+        # check empty bins for unmeric variable
+        init_bin = check_empty_bins(dtm, init_bin)
+        
+        init_bin = init_bin.assign(
           variable = dtm['variable'].values[0],
           brkp = lambda x: [float(re.match('^\[(.*),.+', i).group(1)) for i in x['bin']],
           badprob = lambda x: x['bad']/(x['bad']+x['good'])
