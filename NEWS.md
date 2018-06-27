@@ -1,9 +1,10 @@
-# scorecardpy 0.1.4.3
+# scorecardpy 0.1.4.4
 
 * fixed a bug in woebin_ply function when spl_val is specified.
 * fixed a bug in woebin function when there are NaNs in input dataframe.
 * fixed a bug in perf_eva when calculating auc.
 * fixed a bug in woebin_adj when special_values is provided.
+* fixed a bug in iv function which is caused by pandas' groupby ignoring nan values.
 
 # scorecardpy 0.1.4
 

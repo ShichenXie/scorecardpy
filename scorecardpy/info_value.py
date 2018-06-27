@@ -66,6 +66,7 @@ def iv_xy(x, y):
         return pd.Series(names)
     # iv calculation
     iv_total = pd.DataFrame({'x':x,'y':y}) \
+      .fillna('missing') \
       .groupby('x') \
       .apply(goodbad) \
       .replace(0, 0.9) \
