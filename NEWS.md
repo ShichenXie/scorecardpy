@@ -1,4 +1,4 @@
-# scorecardpy 0.1.4.4
+# scorecardpy 0.1.5
 
 * fixed a bug in woebin_ply function when spl_val is specified.
 * fixed a bug in woebin function when there are NaNs in input dataframe.
@@ -17,6 +17,9 @@
 * fixed the bug in woebin function when there are variables have only one unique value. 
 * modify the default values of x_limits in perf_psi
 * display proc time in woebin
+
+
+
 
 # scorecard 0.1.7
 
