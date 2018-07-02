@@ -122,7 +122,7 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
             dt_rm_reason = pd.concat([
               dt_rm_reason, 
               pd.DataFrame({'variable':var_rm,'rm_reason':"force remove"}, columns=['variable', 'rm_reason'])
-            ])
+            ], sort=False)
         if var_kp is not None:
             dt_rm_reason = dt_rm_reason.query('variable not in {}'.format(var_kp))
             

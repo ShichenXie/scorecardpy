@@ -1,6 +1,7 @@
-# scorecardpy 0.1.5.1
+# scorecardpy 0.1.5.2
 
 * fixed a bug in iv function if the variable is categorical
+* fixed a bug in woebin function when specifing breaks omiting missing
 
 # scorecardpy 0.1.5
 

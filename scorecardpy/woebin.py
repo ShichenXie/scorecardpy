@@ -110,7 +110,7 @@ def dtm_binning_sv(dtm, breaks, spl_val):
               sv_df['value'].astype(dtm['value'].dtypes).astype(str))
             # sv_df = sv_df.assign(value = lambda x: x.value.astype(dtm['value'].dtypes))
         # dtm_sv & dtm
-        dtm_sv = pd.merge(dtm, sv_df[['value']], how='inner', on='value', right_index=True)
+        dtm_sv = pd.merge(dtm.fillna("missing"), sv_df[['value']].fillna("missing"), how='inner', on='value', right_index=True)
         dtm = dtm[~dtm.index.isin(dtm_sv.index)].reset_index() if len(dtm_sv.index) < len(dtm.index) else None
         # dtm_sv = dtm.query('value in {}'.format(sv_df['value'].tolist()))
         # dtm    = dtm.query('value not in {}'.format(sv_df['value'].tolist()))
@@ -134,7 +134,7 @@ def dtm_binning_sv(dtm, breaks, spl_val):
 # check empty bins for unmeric variable
 def check_empty_bins(dtm, binning):
     # check empty bins
-    bin_list = binning.bin.astype(str)
+    bin_list = np.unique(dtm.bin.astype(str)).tolist()
     if 'nan' in bin_list: 
         bin_list.remove('nan')
     binleft = set([re.match(r'\[(.+),(.+)\)', i).group(1) for i in bin_list]).difference(set(['-inf', 'inf']))
@@ -185,6 +185,8 @@ def woebin2_breaks(dtm, breaks, spl_val):
         # cut
         labels = ['[{},{})'.format(bstbrks[i], bstbrks[i+1]) for i in range(len(bstbrks)-1)]
         dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
+        dtm['bin'] = dtm['bin'].astype(str)
+        
         binning = dtm.groupby(['variable','bin'])['y'].agg([n0, n1])\
           .reset_index().rename(columns={'n0':'good','n1':'bad'})
         # check empty bins for unmeric variable
@@ -702,7 +704,7 @@ def woebin2(y, x, x_name, breaks=None, spl_val=None,
                   dtm, min_perc_fine_bin=min_perc_fine_bin, min_perc_coarse_bin=min_perc_coarse_bin, 
                   stop_limit=stop_limit, max_num_bin=max_num_bin, breaks=breaks, spl_val=spl_val)
     # rbind binning_sv and binning
-    binning = pd.concat(bin_list, keys=bin_list.keys()).reset_index()\
+    binning = pd.concat(bin_list, keys=bin_list.keys(), sort=False).reset_index()\
               .assign(is_sv = lambda x: x.level_0 =='binning_sv')
     # return
     return binning_format(binning)
@@ -779,8 +781,8 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     
     # Example III
     # customizing the breakpoints of binning
-    dat2 = pd.concat([dat, 
-      pd.DataFrame({'creditability':['good','bad']}).sample(50, replace=True)])
+    dat2 = pd.DataFrame({'creditability':['good','bad']}).sample(50, replace=True)
+    dat_nan = pd.concat([dat, dat2], ignore_index=True, sort=False)
     
     breaks_list = {
       'age.in.years': [26, 35, 37, "Inf%,%missing"],
@@ -791,7 +793,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
       'purpose': ["education", "others%,%missing"]
     }
     
-    bins_cus_brk = sc.woebin(dat2, y="creditability",
+    bins_cus_brk = sc.woebin(dat_nan, y="creditability",
       x=["age.in.years","credit.amount","housing","purpose"],
       breaks_list=breaks_list, special_values=special_values)
     '''
@@ -1004,7 +1006,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     
     # bins # if (is.list(bins)) rbindlist(bins)
     if isinstance(bins, dict):
-        bins = pd.concat(bins, ignore_index=True)
+        bins = pd.concat(bins, ignore_index=True, sort=False)
     # x variables
     xs_bin = bins['variable'].unique()
     xs_dt = list(dt.columns)
@@ -1031,7 +1033,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
                  # bins.loc[bins['variable'] == x_i] # 
                  # bins.query('variable == \'{}\''.format(x_i))
             dtx = dt[[x_i]]
-            dat = pd.concat([dat, woepoints_ply1(dtx, binx, x_i, woe_points="woe")], axis=1)
+            dat = pd.concat([dat, woepoints_ply1(dtx, binx, x_i, woe_points="woe")], axis=1, sort=False)
     else:
         pool = mp.Pool(processes=no_cores)
         # arguments
@@ -1043,7 +1045,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
         )
         # bins in dictionary
         dat_suffix = pool.starmap(woepoints_ply1, args)
-        dat = pd.concat([dat]+dat_suffix, axis=1)
+        dat = pd.concat([dat]+dat_suffix, axis=1, sort=False)
         pool.close()
     # runingtime
     runingtime = time.time() - start_time
@@ -1159,7 +1161,7 @@ def woebin_plot(bins, x=None, title=None, show_iv=True):
     xs = x
     # bins concat 
     if isinstance(bins, dict):
-        bins = pd.concat(bins, ignore_index=True)
+        bins = pd.concat(bins, ignore_index=True, sort=False)
     # good bad distr
     def gb_distr(binx):
         binx['good_distr'] = binx['good']/sum(binx['count'])
@@ -1290,7 +1292,7 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
     '''
     # bins concat 
     if isinstance(bins, dict):
-        bins = pd.concat(bins, ignore_index=True)
+        bins = pd.concat(bins, ignore_index=True, sort=False)
     # x variables
     xs_all = bins['variable'].unique()
     # adjust all variables
