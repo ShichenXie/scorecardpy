@@ -1,3 +1,7 @@
+# scorecardpy 0.1.5.1
+
+* fixed a bug in iv function if the variable is categorical
+
 # scorecardpy 0.1.5
 
 * fixed a bug in woebin_ply function when spl_val is specified.
