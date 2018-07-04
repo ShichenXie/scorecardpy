@@ -30,7 +30,7 @@ def eva_dfkslift(df, groupnum=None):
     df_kslift=pd.concat([
       pd.DataFrame({'group':0, 'good':0, 'bad':0, 'good_distri':0, 'bad_distri':0, 'badrate':0, 'cumbadrate':np.nan, 'cumgood':0, 'cumbad':0, 'ks':0, 'lift':np.nan}, index=np.arange(1)),
       df_kslift
-    ], ignore_index=True, sort=False)
+    ], ignore_index=True)
     # return
     return df_kslift
 # plot ks    
@@ -102,7 +102,7 @@ def eva_dfrocpr(df):
 def eva_proc(dfrocpr, title):
     dfrocpr = pd.concat(
       [dfrocpr[['FPR','TPR']], pd.DataFrame({'FPR':[0,1], 'TPR':[0,1]})], 
-      ignore_index=True, sort=False).sort_values(['FPR','TPR'])
+      ignore_index=True).sort_values(['FPR','TPR'])
     auc = dfrocpr.sort_values(['FPR','TPR'])\
           .assign(
             TPR_lag=lambda x: x['TPR'].shift(1), FPR_lag=lambda x: x['FPR'].shift(1)
@@ -297,7 +297,7 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
     if 'roc' in plot_type:
         auc = pd.concat(
           [dfrocpr[['FPR','TPR']], pd.DataFrame({'FPR':[0,1], 'TPR':[0,1]})], 
-          ignore_index=True, sort=False).sort_values(['FPR','TPR'])\
+          ignore_index=True).sort_values(['FPR','TPR'])\
           .assign(
             TPR_lag=lambda x: x['TPR'].shift(1), FPR_lag=lambda x: x['FPR'].shift(1)
           ).assign(
@@ -461,7 +461,7 @@ def perf_psi(score, label=None, title=None, x_limits=None, x_tick_break=50, show
         else:
             score[i].copy(deep=True).loc[:,'y'] = np.nan
     # dateset of score and label
-    dt_sl = pd.concat(score, names=['ae', 'rowid'], sort=False).reset_index()\
+    dt_sl = pd.concat(score, names=['ae', 'rowid']).reset_index()\
       .sample(frac=1, random_state=seed)
       # ae refers to 'Actual & Expected'
     
@@ -557,7 +557,7 @@ def perf_psi(score, label=None, title=None, x_limits=None, x_tick_break=50, show
         if return_distr_dat:
             rt_dat[sn] = distr_prob[['N','badprob']].reset_index()
     # return rt
-    rt['psi'] = pd.concat(rt_psi, sort=False).reset_index().rename(columns={'level_0':'variable'})[['variable', 'PSI']]
+    rt['psi'] = pd.concat(rt_psi).reset_index().rename(columns={'level_0':'variable'})[['variable', 'PSI']]
     rt['pic'] = rt_pic
     if return_distr_dat: rt['dat'] = rt_dat
     return rt

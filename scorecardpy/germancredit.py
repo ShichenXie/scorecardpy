@@ -65,7 +65,7 @@ dat1 = germancredit()
 dat1 = check_y(dat1, 'creditability', 'bad|1')
 dat2 = pd.DataFrame({'creditability':[0,1]}).sample(50, replace=True)
 # dat2 = pd.DataFrame({'creditability':np.random.choice([0,1], 50)})
-dat = pd.concat([dat2, dat1], ignore_index=True, sort=False)
+dat = pd.concat([dat2, dat1], ignore_index=True)
 
 ###### dtm ######
 # y

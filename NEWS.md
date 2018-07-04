@@ -1,7 +1,8 @@
-# scorecardpy 0.1.5.2
+# scorecardpy 0.1.5.3
 
 * fixed a bug in iv function if the variable is categorical
 * fixed a bug in woebin function when specifing breaks omiting missing
+* remove sort=False in concat, since it is only available in pandas 0.23
 
 # scorecardpy 0.1.5
 
