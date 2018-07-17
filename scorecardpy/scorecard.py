@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+import numpy as np
 import re
+from collections import OrderedDict
 from .condition_fun import *
 from .woebin import woepoints_ply1
 
@@ -29,7 +31,8 @@ def ab(points0=600, odds0=1/60, pdo=50):
     # points0 - PDO = a - b*log(2*odds0)
     b = pdo/np.log(2)
     a = points0 + b*np.log(odds0) #log(odds0/(1+odds0))
-    return {'a':a, 'b':b}
+    
+    return OrderedDict({'a':a, 'b':b})
 
 
 
