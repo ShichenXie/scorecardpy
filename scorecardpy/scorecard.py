@@ -3,7 +3,6 @@
 import pandas as pd
 import numpy as np
 import re
-from collections import OrderedDict
 from .condition_fun import *
 from .woebin import woepoints_ply1
 
@@ -32,7 +31,7 @@ def ab(points0=600, odds0=1/60, pdo=50):
     b = pdo/np.log(2)
     a = points0 + b*np.log(odds0) #log(odds0/(1+odds0))
     
-    return OrderedDict({'a':a, 'b':b})
+    return {'a':a, 'b':b}
 
 
 
@@ -99,7 +98,8 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
     
     # coefficients
     aabb = ab(points0, odds0, pdo)
-    a, b = aabb.values()
+    a = aabb['a'] 
+    b = aabb['b']
     # odds = pred/(1-pred); score = a - b*log(odds)
     
     # bins # if (is.list(bins)) rbindlist(bins)

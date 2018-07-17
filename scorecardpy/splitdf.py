@@ -57,5 +57,8 @@ def split_df(dt, y=None, ratio=0.7, seed=186):
           .reset_index(level=y, drop=True)\
           .sort_index()
         test = dt.iloc[list(set(dt.index.tolist()).difference(set(train.index.tolist())))].sort_index()
-    return OrderedDict({'train': train, 'test': test})
+    tt = OrderedDict()
+    tt['train'] = train
+    tt['test'] = test
+    return tt
 
