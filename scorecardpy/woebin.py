@@ -192,16 +192,18 @@ def woebin2_breaks(dtm, breaks, spl_val):
         # check empty bins for unmeric variable
         binning = check_empty_bins(dtm, binning)
         
+        # sort bin
+        binning = pd.merge(
+          binning.assign(value=lambda x: [float(re.search(r"^\[(.*),(.*)\)", i).group(2)) if i != 'nan' else np.nan for i in binning['bin']] ),
+          bk_df.assign(value=lambda x: x.value.astype(float)), 
+          how='left',on='value'
+        ).sort_values(by="rowid").reset_index(drop=True)
         # merge binning and bk_df if nan isin value
         if bk_df['value'].isnull().any():
-            binning = pd.merge(
-              binning.assign(value=lambda x: [float(re.search(r"^\[(.*),(.*)\)", i).group(2)) if i != 'nan' else np.nan for i in binning['bin']] ),
-              bk_df.assign(value=lambda x: x.value.astype(float)), 
-              how='left',on='value'
-            ).assign(bin=lambda x: [i if i != 'nan' else 'missing' for i in x['bin']])\
-            .fillna('missing').groupby(['variable','rowid'])\
-            .agg({'bin':lambda x: '%,%'.join(x), 'good':sum, 'bad':sum})\
-            .reset_index()
+            binning = binning.assign(bin=lambda x: [i if i != 'nan' else 'missing' for i in x['bin']])\
+              .fillna('missing').groupby(['variable','rowid'])\
+              .agg({'bin':lambda x: '%,%'.join(x), 'good':sum, 'bad':sum})\
+              .reset_index()
     else:
         # merge binning with bk_df
         binning = pd.merge(

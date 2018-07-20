@@ -61,11 +61,17 @@ def germancredit():
 
 '''
 # datasets
-dat1 = germancredit()
+import scorecardpy as sc
+dat1 = sc.germancredit()
 dat1 = check_y(dat1, 'creditability', 'bad|1')
 dat2 = pd.DataFrame({'creditability':[0,1]}).sample(50, replace=True)
 # dat2 = pd.DataFrame({'creditability':np.random.choice([0,1], 50)})
 dat = pd.concat([dat2, dat1], ignore_index=True)
+
+
+y = "creditability"
+x_i = "duration.in.month"
+dtm = pd.DataFrame({'y':dat[y], 'variable':x_i, 'value':dt[x_i]})
 
 ###### dtm ######
 # y
