@@ -1,11 +1,12 @@
 # scorecardpy
 
-This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). It makes the development of credit risk scorecard easily and efficiently by providing functions as follows: 
-- information value (iv), 
-- variable filter (var_filter), 
-- optimal woe binning (woebin, woebin_ply, woebin_plot, woebin_adj), 
-- scorecard scaling (scorecard, scorecard_ply) 
-- and performace evaluation (perf_eva, perf_psi).
+This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). 
+Its goal is to make the development of traditional credit risk scorecard model easier and efficient by providing R functions for some common tasks. 
+- data partition (`split_df`)
+- variable selection (`iv`, `var_filter`)
+- weight of evidence (woe) binning (`woebin`, `woebin_plot`, `woebin_adj`, `woebin_ply`)
+- scorecard scaling (`scorecard`, `scorecard_ply`)
+- performance evaluation (`perf_eva`, `perf_psi`)
 
 ## Installation
 
