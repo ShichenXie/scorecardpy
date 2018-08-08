@@ -1,5 +1,7 @@
 # scorecardpy
 
+[![Downloads](http://pepy.tech/badge/scorecardpy)](http://pepy.tech/project/scorecardpy)
+
 This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). 
 Its goal is to make the development of traditional credit risk scorecard model easier and efficient by providing R functions for some common tasks. 
 - data partition (`split_df`)

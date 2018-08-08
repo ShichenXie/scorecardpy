@@ -1,6 +1,6 @@
 # scorecardpy 0.1.6.1
 
-* pdo in scorecard function suports negative value. If pdo is positive, the larger score means the lower probability to be positive. If pdo is negative, the larger score means the higher probability to be positive.
+* pdo in scorecard function now suports negative value. If pdo is positive, the larger score means the lower probability to be positive sample. If pdo is negative, the larger score means the higher probability to be positive sample.
 
 # scorecardpy 0.1.6
 

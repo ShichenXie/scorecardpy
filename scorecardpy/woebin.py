@@ -669,7 +669,7 @@ def binning_format(binning):
 
 # woebin2
 # This function provides woe binning for only two columns (one x and one y) dataframe.
-def woebin2(y, x, x_name, breaks=None, spl_val=None, 
+def woebin2(dtm, breaks=None, spl_val=None, 
             min_perc_fine_bin=0.02, min_perc_coarse_bin=0.05, 
             stop_limit=0.1, max_num_bin=8, method="tree"):
     '''
@@ -684,8 +684,6 @@ def woebin2(y, x, x_name, breaks=None, spl_val=None,
     DataFrame
         
     '''
-    # melt data.table
-    dtm = pd.DataFrame({'y':y, 'variable':x_name, 'value':x})
     # binning
     if breaks is not None:
         # 1.return binning if breaks provided
@@ -856,7 +854,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
                 print(('{:'+str(len(str(xs_len)))+'.0f}/{} {}').format(i, xs_len, x_i), flush=True)
             # woebining on one variable
             bins[x_i] = woebin2(
-              y=dt[y], x=dt[x_i], x_name=x_i,
+              dtm = pd.DataFrame({'y':dt[y], 'variable':x_i, 'value':dt[x_i]}),
               breaks=breaks_list[x_i] if (breaks_list is not None) and (x_i in breaks_list.keys()) else None,
               spl_val=special_values[x_i] if (special_values is not None) and (x_i in special_values.keys()) else None,
               min_perc_fine_bin=min_perc_fine_bin,
@@ -871,7 +869,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
         pool = mp.Pool(processes=no_cores)
         # arguments
         args = zip(
-          [dt[y]]*xs_len, [dt[i] for i in xs], [i for i in xs], 
+          [pd.DataFrame({'y':dt[y], 'variable':x_i, 'value':dt[x_i]}) for x_i in xs], 
           [breaks_list[i] if (breaks_list is not None) and (i in list(breaks_list.keys())) else None for i in xs],
           [special_values[i] if (special_values is not None) and (i in list(special_values.keys())) else None for i in xs],
           [min_perc_fine_bin]*xs_len, [min_perc_coarse_bin]*xs_len, 
