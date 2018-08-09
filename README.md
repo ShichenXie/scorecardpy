@@ -1,5 +1,6 @@
 # scorecardpy
 
+[![PyPI](https://badge.fury.io/py/scorecardpy.svg)](https://badge.fury.io/py/scorecardpy)
 [![Downloads](http://pepy.tech/badge/scorecardpy)](http://pepy.tech/project/scorecardpy)
 
 This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). 
