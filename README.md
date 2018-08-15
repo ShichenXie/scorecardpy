@@ -1,7 +1,17 @@
 # scorecardpy
 
-[![PyPI](https://badge.fury.io/py/scorecardpy.svg)](https://badge.fury.io/py/scorecardpy)
+
 [![Downloads](http://pepy.tech/badge/scorecardpy)](http://pepy.tech/project/scorecardpy)
+
+.. image:: https://img.shields.io/pypi/v/scorecardpy.svg
+   :target: https://pypi.python.org/pypi/scorecardpy
+   :alt: PyPI release
+
+.. image:: https://img.shields.io/pypi/pyversions/scorecardpy.svg
+   :target: https://pypi.python.org/pypi/scorecardpy
+   :alt: PyPI version
+
+
 
 This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). 
 Its goal is to make the development of traditional credit risk scorecard model easier and efficient by providing R functions for some common tasks. 
