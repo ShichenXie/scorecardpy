@@ -1,16 +1,8 @@
 # scorecardpy
 
-
 [![Downloads](http://pepy.tech/badge/scorecardpy)](http://pepy.tech/project/scorecardpy)
-
-.. image:: https://img.shields.io/pypi/v/scorecardpy.svg
-   :target: https://pypi.python.org/pypi/scorecardpy
-   :alt: PyPI release
-
-.. image:: https://img.shields.io/pypi/pyversions/scorecardpy.svg
-   :target: https://pypi.python.org/pypi/scorecardpy
-   :alt: PyPI version
-
+[![PyPI release](https://img.shields.io/pypi/v/scorecardpy.svg)](https://pypi.python.org/pypi/scorecardpy)
+[![PyPI version](https://img.shields.io/pypi/pyversions/scorecardpy.svg)](https://pypi.python.org/pypi/scorecardpy)
 
 
 This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). 
