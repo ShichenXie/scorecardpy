@@ -1,7 +1,8 @@
-# scorecardpy 0.1.6.1
+# scorecardpy 0.1.6.2
 
 * pdo in scorecard function now suports negative value. If pdo is positive, the larger score means the lower probability to be positive sample. If pdo is negative, the larger score means the higher probability to be positive sample.
 * fixed a bug in woebin function using chimerge method, which is caused by initial breaks have out-range values.
+* added a check function on the length of unique values in string columns, which might cause the binning process slow.
 
 # scorecardpy 0.1.6
 

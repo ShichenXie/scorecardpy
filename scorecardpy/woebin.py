@@ -289,7 +289,7 @@ def woebin2_init_bin(dtm, min_perc_fine_bin, breaks, spl_val):
         # initial breaks
         brk = np.unique(xvalue_rm_outlier) if len_uniq_x < 10 else pretty(min(xvalue_rm_outlier), max(xvalue_rm_outlier), n)
         
-        brk = list(filter(lambda x: x>np.nanmin(xvalue_rm_outlier) and x<np.nanmax(xvalue_rm_outlier), brk))
+        brk = list(filter(lambda x: x>np.nanmin(xvalue) and x<np.nanmax(xvalue), brk))
         brk = [float('-inf')] + sorted(brk) + [float('inf')]
         # initial binning datatable
         # cut

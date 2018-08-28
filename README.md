@@ -6,7 +6,7 @@
 
 
 This package is python version of R package [scorecard](https://github.com/ShichenXie/scorecard). 
-Its goal is to make the development of traditional credit risk scorecard model easier and efficient by providing R functions for some common tasks. 
+Its goal is to make the development of traditional credit risk scorecard model easier and efficient by providing functions for some common tasks. 
 - data partition (`split_df`)
 - variable selection (`iv`, `var_filter`)
 - weight of evidence (woe) binning (`woebin`, `woebin_plot`, `woebin_adj`, `woebin_ply`)
@@ -15,12 +15,12 @@ Its goal is to make the development of traditional credit risk scorecard model e
 
 ## Installation
 
-1. Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
+- Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
 ```
 pip install scorecardpy
 ```
 
-2. Install the latest version of `scorecardpy` from [github](https://github.com/shichenxie/scorecardpy) with:
+- Install the latest version of `scorecardpy` from [github](https://github.com/shichenxie/scorecardpy) with:
 ```
 pip install git+git://github.com/shichenxie/scorecardpy.git
 ```
