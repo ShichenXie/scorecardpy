@@ -5,6 +5,7 @@
 * added a check function on the length of unique values in string columns, which might cause the binning process slow.
 * fixed a bug in perf_eva function which is caused by the nrow of plot is setted to 0 when the length of plot type is one.
 * the ratio argument in split_df function supports to set ratios for both train and test.
+* If the argument return_rm_reason is TRUE in var_filter function, the info_value, missing_rate and identical_rate are provided.
 
 # scorecardpy 0.1.6
 

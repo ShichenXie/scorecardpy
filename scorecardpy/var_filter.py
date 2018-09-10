@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import numpy as np
 import pandas as pd
 import warnings
 import time
@@ -84,16 +85,16 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     iv_list = iv(dt, y, x, order=False)
     # -na percentage
     nan_rate = lambda a: a[a.isnull()].size/a.size
-    na_perc = dt[x].apply(nan_rate).reset_index(name='missingrate').rename(columns={'index':'variable'})
+    na_perc = dt[x].apply(nan_rate).reset_index(name='missing_rate').rename(columns={'index':'variable'})
     # -identical percentage
     idt_rate = lambda a: a.value_counts().max() / a.size
-    identical_perc = dt[x].apply(idt_rate).reset_index(name='identicalrate').rename(columns={'index':'variable'})
+    identical_perc = dt[x].apply(idt_rate).reset_index(name='identical_rate').rename(columns={'index':'variable'})
     
     # dataframe iv na idt
     dt_var_selector = iv_list.merge(na_perc,on='variable').merge(identical_perc,on='variable')
     # remove na_perc>95 | ele_perc>0.95 | iv<0.02
     # variable datatable selected
-    dt_var_sel = dt_var_selector.query('(info_value >= {}) & (missingrate <= {}) & (identicalrate <= {})'.format(iv_limit,missing_limit,identical_limit))
+    dt_var_sel = dt_var_selector.query('(info_value >= {}) & (missing_rate <= {}) & (identical_rate <= {})'.format(iv_limit,missing_limit,identical_limit))
     
     # add kept variable
     x_selected = dt_var_sel.variable.tolist()
@@ -109,11 +110,11 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
         print('Variable filtering on {} rows and {} columns in {} \n{} variables are removed'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime)), dt.shape[1]-len(x_selected+[y])))
     # return remove reason
     if return_rm_reason:
-        dt_var_rm = dt_var_selector.query('(info_value < {}) | (missingrate > {}) | (identicalrate > {})'.format(iv_limit,missing_limit,identical_limit)) \
+        dt_var_rm = dt_var_selector.query('(info_value < {}) | (missing_rate > {}) | (identical_rate > {})'.format(iv_limit,missing_limit,identical_limit)) \
           .assign(
             info_value = lambda x: ['info_value<{}'.format(iv_limit) if i else np.nan for i in (x.info_value < iv_limit)], 
-            missingrate = lambda x: ['missingrate>{}'.format(missing_limit) if i else np.nan for i in (x.missingrate > missing_limit)],
-            identicalrate = lambda x: ['identicalrate>{}'.format(identical_limit) if i else np.nan for i in (x.identicalrate > identical_limit)]
+            missing_rate = lambda x: ['missing_rate>{}'.format(missing_limit) if i else np.nan for i in (x.missing_rate > missing_limit)],
+            identical_rate = lambda x: ['identical_rate>{}'.format(identical_limit) if i else np.nan for i in (x.identical_rate > identical_limit)]
           )
         dt_rm_reason = pd.melt(dt_var_rm, id_vars=['variable'], var_name='iv_mr_ir').dropna()\
         .groupby('variable').apply(lambda x: ', '.join(x.value)).reset_index(name='rm_reason')
@@ -125,7 +126,8 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
             ])
         if var_kp is not None:
             dt_rm_reason = dt_rm_reason.query('variable not in {}'.format(var_kp))
-            
+        
+        dt_rm_reason = pd.merge(dt_rm_reason, dt_var_selector, how='outer', on = 'variable')
         return {'dt': dt_kp, 'rm':dt_rm_reason}
     else:
       return dt_kp
