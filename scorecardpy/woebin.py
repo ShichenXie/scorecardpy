@@ -1340,8 +1340,9 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
         
     # init param
     i = 1
-    breaks_list = breaks = None
+    breaks_list = None
     while i <= xs_len:
+        breaks = stop_limit = None
         # x_i
         x_i = xs_adj[i-1]
         sv_i = special_values[x_i] if (special_values is not None) and (x_i in special_values.keys()) else None
