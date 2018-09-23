@@ -1,3 +1,4 @@
+
 # scorecardpy 0.1.6.5
 
 * pdo in scorecard function now suports negative value. If pdo is positive, the larger score means the lower probability to be positive sample. If pdo is negative, the larger score means the higher probability to be positive sample.
@@ -7,6 +8,7 @@
 * the ratio argument in split_df function supports to set ratios for both train and test.
 * If the argument return_rm_reason is TRUE in var_filter function, the info_value, missing_rate and identical_rate are provided.
 * fixed a bug in woebin_adj that breaks do not update when chooseing next. 
+* fixed a bug is woebin function cant modify positive values
 
 # scorecardpy 0.1.6
 

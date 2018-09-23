@@ -56,6 +56,7 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
 #' @import data.table
 #'
 def check_y(dat, y, positive):
+    positive = str(positive)
     # ncol of dt
     if isinstance(dat, pd.DataFrame) & (dat.shape[1] <= 1): 
         raise Exception("Incorrect inputs; dat should be a DataFrame with at least two columns.")
@@ -81,12 +82,12 @@ def check_y(dat, y, positive):
     # length of unique values in y
     unique_y = np.unique(dat[y].values)
     if len(unique_y) == 2:
-        if [v not in [0,1] for v in unique_y] == [True, True]:
-            if True in [bool(re.search(positive, str(v))) for v in unique_y]:
-                warnings.warn("The positive value in \"{}\" was replaced by 1 and negative value by 0.".format(y))
-                dat[y] = dat[y].apply(lambda x: 1 if str(x) in re.split('\|', positive) else 0)
-            else:
-                raise Exception("Incorrect inputs; the positive value in \"{}\" is not specified".format(y))
+        # if [v not in [0,1] for v in unique_y] == [True, True]:
+        if True in [bool(re.search(positive, str(v))) for v in unique_y]:
+            warnings.warn("The positive value in \"{}\" was replaced by 1 and negative value by 0.".format(y))
+            dat[y] = dat[y].apply(lambda x: 1 if str(x) in re.split('\|', positive) else 0)
+        else:
+            raise Exception("Incorrect inputs; the positive value in \"{}\" is not specified".format(y))
     else:
         raise Exception("Incorrect inputs; the length of unique values in y column \'{}\' != 2.".format(y))
     
