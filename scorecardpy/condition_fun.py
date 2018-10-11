@@ -8,20 +8,21 @@ from pandas.api.types import is_numeric_dtype
 
 # remove date time columns # rm_datetime_col
 # remove columns if len(x.unique()) == 1
-def rmcol_datetime_unique1(dat): # add more datatime types later
-    # character columns with too many unique values
-    char_cols = [i for i in list(dat) if not is_numeric_dtype(dat[i])]
-    char_cols_too_many_unique = [i for i in char_cols if len(dat[i].unique()) >= 50]
-
-    if len(char_cols_too_many_unique) > 0:
-        print('>>> There are {} variables have too many unique non-numberic values, which might cause the binning process slow. Please double check the following variables: \n{}'.format(len(char_cols_too_many_unique), ', '.join(char_cols_too_many_unique)))
-        print('>>> Continue the binning process?')
-        print('1: yes \n2: no \n')
-        cont = int(input("Selection: "))
-        while cont not in [1, 2]:
+def rmcol_datetime_unique1(dat, check_char_num = False): # add more datatime types later
+    if check_char_num:
+        # character columns with too many unique values
+        char_cols = [i for i in list(dat) if not is_numeric_dtype(dat[i])]
+        char_cols_too_many_unique = [i for i in char_cols if len(dat[i].unique()) >= 50]
+    
+        if len(char_cols_too_many_unique) > 0:
+            print('>>> There are {} variables have too many unique non-numberic values, which might cause the binning process slow. Please double check the following variables: \n{}'.format(len(char_cols_too_many_unique), ', '.join(char_cols_too_many_unique)))
+            print('>>> Continue the binning process?')
+            print('1: yes \n2: no \n')
             cont = int(input("Selection: "))
-        if cont == 2:
-            raise SystemExit(0)
+            while cont not in [1, 2]:
+                cont = int(input("Selection: "))
+            if cont == 2:
+                raise SystemExit(0)
 
     # remove only 1 unique vlaues variable 
     unique1_cols = [i for i in list(dat) if len(dat[i].unique())==1]
