@@ -39,6 +39,8 @@ def iv(dt, y, x=None, positive='bad|1', order=True):
     '''
     
     dt = dt.copy(deep=True)
+    if x is not None: 
+        dt = dt[[y,x]]
     # remove date/time col
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA

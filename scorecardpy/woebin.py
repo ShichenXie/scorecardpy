@@ -806,6 +806,8 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     start_time = time.time()
     
     dt = dt.copy(deep=True)
+    if x is not None: 
+        dt = dt[[y,x]]
     # remove date/time col
     dt = rmcol_datetime_unique1(dt, check_char_num = True)
     # replace "" by NA

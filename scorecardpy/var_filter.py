@@ -57,6 +57,8 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     start_time = time.time()
     
     dt = dt.copy(deep=True)
+    if x is not None: 
+        dt = dt[[y,x]]
     # remove date/time col
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
