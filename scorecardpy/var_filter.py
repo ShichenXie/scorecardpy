@@ -10,7 +10,7 @@ from .info_value import *
 
 def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95, 
                identical_limit=0.95, var_rm=None, var_kp=None, 
-               return_rm_reason=False, positive='bad'):
+               return_rm_reason=False, positive='bad|1'):
     '''
     Variable Filter
     ------
@@ -33,7 +33,7 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     var_rm: Name of force removed variables, default is NULL.
     var_kp: Name of force kept variables, default is NULL.
     return_rm_reason: Logical, default is FALSE.
-    positive: Value of positive class, default is "bad".
+    positive: Value of positive class, default is "bad|1".
     
     Returns
     ------

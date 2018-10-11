@@ -85,8 +85,11 @@ def check_y(dat, y, positive):
     if len(unique_y) == 2:
         # if [v not in [0,1] for v in unique_y] == [True, True]:
         if True in [bool(re.search(positive, str(v))) for v in unique_y]:
-            warnings.warn("The positive value in \"{}\" was replaced by 1 and negative value by 0.".format(y))
-            dat[y] = dat[y].apply(lambda x: 1 if str(x) in re.split('\|', positive) else 0)
+            y1 = dat[y]
+            y2 = dat[y].apply(lambda x: 1 if str(x) in re.split('\|', positive) else 0)
+            if (y1 != y2).any():
+                dat[y] = y2
+                warnings.warn("The positive value in \"{}\" was replaced by 1 and negative value by 0.".format(y))
         else:
             raise Exception("Incorrect inputs; the positive value in \"{}\" is not specified".format(y))
     else:
