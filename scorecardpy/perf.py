@@ -180,7 +180,7 @@ def eva_pf1(dfrocpr, title):
     
 
 
-def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], show_plot=True, positive="bad|1", seed=186):
+def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], show_plot=True, positive="bad", seed=186):
     '''
     KS, ROC, Lift, PR
     ------
@@ -199,7 +199,7 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
     plot_type: Types of performance plot, such as "ks", "lift", "roc", "pr". 
       Default c("ks", "roc").
     show_plot: Logical value, default is TRUE. It means whether to show plot.
-    positive: Value of positive class, default is "bad|1".
+    positive: Value of positive class, default is "bad".
     seed: Integer, default is 186. The specify seed is used for random sorting data.
     
     Returns

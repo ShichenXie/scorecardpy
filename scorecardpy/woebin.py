@@ -716,7 +716,7 @@ def woebin2(dtm, breaks=None, spl_val=None,
 def woebin(dt, y, x=None, breaks_list=None, special_values=None, 
            min_perc_fine_bin=0.02, min_perc_coarse_bin=0.05, 
            stop_limit=0.1, max_num_bin=8, 
-           positive="bad|1", no_cores=None, print_step=0, method="tree"):
+           positive="bad", no_cores=None, print_step=0, method="tree"):
     '''
     WOE Binning
     ------
@@ -750,7 +750,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
       when the minimum of chi-square less than 'qchisq(1-stoplimit, 1)'. 
       Accepted range: 0-0.5; default is 0.1.
     max_num_bin: Integer. The maximum number of binning.
-    positive: Value of positive class, default "bad|1".
+    positive: Value of positive class, default "bad".
     no_cores: Number of CPU cores for parallel computation. 
       Defaults NULL. If no_cores is NULL, the no_cores will 
       set as 1 if length of x variables less than 10, and will 
