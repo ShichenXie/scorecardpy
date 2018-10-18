@@ -806,8 +806,12 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     start_time = time.time()
     
     dt = dt.copy(deep=True)
+    if isinstance(y, str):
+        y = [y]
+    if isinstance(x, str) and x is not None:
+        x = [x]
     if x is not None: 
-        dt = dt[[y,x]]
+        dt = dt[y+x]
     # remove date/time col
     dt = rmcol_datetime_unique1(dt, check_char_num = True)
     # replace "" by NA
@@ -849,6 +853,9 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     # loop on xs
     if (no_cores is None) or (no_cores < 1):
         no_cores = 1 if xs_len<10 else mp.cpu_count()
+    
+    # ylist to str
+    y = y[0]
     # binning for variables
     if no_cores == 1:
         # create empty bins dict

@@ -39,8 +39,12 @@ def iv(dt, y, x=None, positive='bad|1', order=True):
     '''
     
     dt = dt.copy(deep=True)
+    if isinstance(y, str):
+        y = [y]
+    if isinstance(x, str) and x is not None:
+        x = [x]
     if x is not None: 
-        dt = dt[[y,x]]
+        dt = dt[y+x]
     # remove date/time col
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
@@ -48,11 +52,11 @@ def iv(dt, y, x=None, positive='bad|1', order=True):
     # check y
     dt = check_y(dt, y, positive)
     # x variable names
-    x = x_variable(dt, y, x)
+    xs = x_variable(dt, y, x)
     # info_value
     ivlist = pd.DataFrame({
-        'variable': x,
-        'info_value': [iv_xy(dt[i], dt[y]) for i in x]
+        'variable': xs,
+        'info_value': [iv_xy(dt[i], dt[y[0]]) for i in xs]
     }, columns=['variable', 'info_value'])
     # sorting iv
     if order: 

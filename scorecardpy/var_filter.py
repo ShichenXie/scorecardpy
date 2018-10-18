@@ -57,8 +57,12 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     start_time = time.time()
     
     dt = dt.copy(deep=True)
+    if isinstance(y, str):
+        y = [y]
+    if isinstance(x, str) and x is not None:
+        x = [x]
     if x is not None: 
-        dt = dt[[y,x]]
+        dt = dt[y+x]
     # remove date/time col
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
@@ -103,13 +107,13 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     if var_kp is not None: 
         x_selected = np.unique(x_selected+var_kp).tolist()
     # data kept
-    dt_kp = dt[x_selected+[y]]
+    dt_kp = dt[x_selected+y]
     
     # runingtime
     runingtime = time.time() - start_time
     if (runingtime >= 10):
         # print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
-        print('Variable filtering on {} rows and {} columns in {} \n{} variables are removed'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime)), dt.shape[1]-len(x_selected+[y])))
+        print('Variable filtering on {} rows and {} columns in {} \n{} variables are removed'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime)), dt.shape[1]-len(x_selected+y)))
     # return remove reason
     if return_rm_reason:
         dt_var_rm = dt_var_selector.query('(info_value < {}) | (missing_rate > {}) | (identical_rate > {})'.format(iv_limit,missing_limit,identical_limit)) \

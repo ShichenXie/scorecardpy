@@ -43,6 +43,11 @@ def rmcol_datetime_unique1(dat, check_char_num = False): # add more datatime typ
 #' @import data.table
 #'
 def rep_blank_na(dat): # cant replace blank string in categorical value with nan
+    # remove duplicated index
+    if dat.index.duplicated().any():
+        dat = dat.reset_index()
+        warnings.warn('There are duplicated index in dataset. The index has been reseted.')
+    
     blank_cols = [index for index, x in dat.isin(['', ' ']).sum().iteritems() if x > 0]
     if len(blank_cols) > 0:
         warnings.warn('There are blank strings in {} columns, which are replaced with NaN. \n (ColumnNames: {})'.format(len(blank_cols), ', '.join(blank_cols)))
@@ -80,6 +85,10 @@ def check_y(dat, y, positive):
         dat = dat.dropna(subset=[y])
         # dat = dat[pd.notna(dat[y])]
     
+    
+    # numeric y to int
+    if is_numeric_dtype(dat[y]):
+        dat.loc[:,y] = dat[y].apply(lambda x: x if pd.isnull(x) else int(x)) #dat[y].astype(int)
     # length of unique values in y
     unique_y = np.unique(dat[y].values)
     if len(unique_y) == 2:
@@ -88,7 +97,7 @@ def check_y(dat, y, positive):
             y1 = dat[y]
             y2 = dat[y].apply(lambda x: 1 if str(x) in re.split('\|', positive) else 0)
             if (y1 != y2).any():
-                dat[y] = y2
+                dat.loc[:,y] = y2#dat[y] = y2
                 warnings.warn("The positive value in \"{}\" was replaced by 1 and negative value by 0.".format(y))
         else:
             raise Exception("Incorrect inputs; the positive value in \"{}\" is not specified".format(y))
@@ -110,7 +119,9 @@ def check_print_step(print_step):
 
 # x variable
 def x_variable(dat, y, x):
-    x_all = set(list(dat)).difference(set([y]))
+    if isinstance(y, str):
+        y = [y]
+    x_all = list(set(dat.columns) - set(y))
     
     if x is None:
         x = x_all

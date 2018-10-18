@@ -49,7 +49,8 @@ def split_df(dt, y=None, ratio=0.7, seed=186):
     dt = rep_blank_na(dt)
     
     # set ratio range
-    if isinstance(ratio, float): ratio = [ratio]
+    if isinstance(ratio, float): 
+        ratio = [ratio]
     if not all(isinstance(i, float) for i in ratio) or len(ratio)>2 or sum(ratio)>1:
         warnings.warn("Incorrect inputs; ratio must be a numeric that length equal to 1 and less than 1. It was set to 0.7.")
         ratio = [0.7, 0.3]
@@ -59,13 +60,13 @@ def split_df(dt, y=None, ratio=0.7, seed=186):
     # split into train and test
     if y is None:
         train = dt.sample(frac=ratio[0], random_state=seed).sort_index()
-        test = dt.iloc[list(set(dt.index.tolist()).difference(set(train.index.tolist())))].sort_index()
+        test = dt.loc[list(set(dt.index.tolist())-set(train.index.tolist()))].sort_index()
     else:
         train = dt.groupby(y)\
           .apply(lambda x: x.sample(frac=ratio[0], random_state=seed))\
           .reset_index(level=y, drop=True)\
           .sort_index()
-        test = dt.iloc[list(set(dt.index.tolist()).difference(set(train.index.tolist())))].sort_index()
+        test = dt.loc[list(set(dt.index.tolist())-set(train.index.tolist()))].sort_index()
         if len(ratio) == 3:
             test = test.groupby(y)\
                 .apply(lambda x: x.sample(frac=ratio[1]/sum(ratio[1:]), random_state=seed))\
