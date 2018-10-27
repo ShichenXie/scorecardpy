@@ -9,3 +9,14 @@ from scorecardpy.woebin import (woebin, woebin_ply, woebin_plot, woebin_adj)
 from scorecardpy.perf import (perf_eva, perf_psi)
 from scorecardpy.scorecard import (scorecard, scorecard_ply)
 
+
+from scorecardpy._version import __version__
+__all__ = (
+    germancredit,
+    split_df, 
+    iv,
+    var_filter,
+    woebin, woebin_ply, woebin_plot, woebin_adj,
+    perf_eva, perf_psi,
+    scorecard, scorecard_ply
+)

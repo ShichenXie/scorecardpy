@@ -8,7 +8,7 @@ from .woebin import woepoints_ply1
 
 
 # coefficients in scorecard
-def ab(points0=600, odds0=1/60, pdo=50):
+def ab(points0=600, odds0=1/19, pdo=50):
     # sigmoid function
     # library(ggplot2)
     # ggplot(data.frame(x = c(-5, 5)), aes(x)) + stat_function(fun = function(x) 1/(1+exp(-x)))

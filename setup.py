@@ -22,7 +22,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='scorecardpy',  # Required
-    version='0.1.7',  # Required
+    version=open("scorecardpy/_version.py").readlines()[-1].split()[-1].strip("\"'"),#'0.1.7',  # Required
     description='Credit Risk Scorecard',  # Required
     long_description=long_description,  # Optional
     long_description_content_type='text/markdown',  # Optional (see note above)
