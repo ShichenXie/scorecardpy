@@ -14,15 +14,20 @@ from setuptools import setup#, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+import re
 
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+# Get the version from __init__
+with open(path.join(here, 'scorecardpy/__init__.py'), encoding='utf-8') as f:
+    __version__ = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read()).group(1)
+
 setup(
     name='scorecardpy',  # Required
-    version=open("scorecardpy/_version.py").readlines()[-1].split()[-1].strip("\"'"),#'0.1.7',  # Required
+    version=__version__,  # Required
     description='Credit Risk Scorecard',  # Required
     long_description=long_description,  # Optional
     long_description_content_type='text/markdown',  # Optional (see note above)
