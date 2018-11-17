@@ -804,6 +804,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     '''
     # start time
     start_time = time.time()
+    print('[INFO] creating woe binning ...')
     
     dt = dt.copy(deep=True)
     if isinstance(y, str):
@@ -1009,6 +1010,8 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     '''
     # start time
     start_time = time.time()
+    print('[INFO] converting into woe values ...')
+    
     # remove date/time col
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA

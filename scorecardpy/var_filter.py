@@ -55,6 +55,7 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     '''
     # start time
     start_time = time.time()
+    print('[INFO] filtering variables ...')
     
     dt = dt.copy(deep=True)
     if isinstance(y, str):
