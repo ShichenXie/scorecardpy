@@ -1,3 +1,6 @@
+# scorecardpy 0.1.7.1
+
+* pdo in scorecard function now supports negative value.
 
 # scorecardpy 0.1.7
 

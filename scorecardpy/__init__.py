@@ -10,7 +10,7 @@ from scorecardpy.perf import (perf_eva, perf_psi)
 from scorecardpy.scorecard import (scorecard, scorecard_ply)
 
 
-__version__ = '0.1.7'
+__version__ = '0.1.7.1'
 
 __all__ = (
     germancredit,

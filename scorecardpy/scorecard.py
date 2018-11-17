@@ -28,10 +28,11 @@ def ab(points0=600, odds0=1/19, pdo=50):
     # two hypothesis
     # points0 = a - b*log(odds0)
     # points0 - PDO = a - b*log(2*odds0)
-    if pdo > 0:
-        b = pdo/np.log(2)
-    else:
-        b = -pdo/np.log(2)
+    # if pdo > 0:
+    #     b = pdo/np.log(2)
+    # else:
+    #     b = -pdo/np.log(2)
+    b = pdo/np.log(2)
     a = points0 + b*np.log(odds0) #log(odds0/(1+odds0))
     
     return {'a':a, 'b':b}
