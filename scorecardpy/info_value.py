@@ -9,7 +9,10 @@ def iv(dt, y, x=None, positive='bad|1', order=True):
     '''
     Information Value
     ------
-    This function calculates information value (IV) for multiple x variables.
+    This function calculates information value (IV) for multiple x variables. 
+    It treats each unique x value as a group and counts the number of y 
+    classes. If there is a zero number of y class, it will be replaced by 
+    0.99 to make sure it calculable.
     
     Params
     ------

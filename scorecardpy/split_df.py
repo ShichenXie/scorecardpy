@@ -62,15 +62,13 @@ def split_df(dt, y=None, ratio=0.7, seed=186):
         train = dt.sample(frac=ratio[0], random_state=seed).sort_index()
         test = dt.loc[list(set(dt.index.tolist())-set(train.index.tolist()))].sort_index()
     else:
-        train = dt.groupby(y)\
+        train = dt.groupby(y, group_keys=False)\
           .apply(lambda x: x.sample(frac=ratio[0], random_state=seed))\
-          .reset_index(level=y, drop=True)\
           .sort_index()
         test = dt.loc[list(set(dt.index.tolist())-set(train.index.tolist()))].sort_index()
         if len(ratio) == 3:
-            test = test.groupby(y)\
+            test = test.groupby(y, group_keys=False)\
                 .apply(lambda x: x.sample(frac=ratio[1]/sum(ratio[1:]), random_state=seed))\
-                .reset_index(level=y, drop=True)\
                 .sort_index()
     # return
     rt = OrderedDict()

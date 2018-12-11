@@ -1,6 +1,7 @@
 # scorecardpy 0.1.7.1
 
 * pdo in scorecard function now supports negative value.
+* fixed a bug in split_df when the input dataframe has a specified index.
 
 # scorecardpy 0.1.7
 
