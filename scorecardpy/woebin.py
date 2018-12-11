@@ -727,7 +727,8 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     The default woe is defined as ln(Distr_Bad_i/Distr_Good_i). If you 
     prefer ln(Distr_Good_i/Distr_Bad_i), please set the argument `positive` 
     as negative value, such as '0' or 'good'. If there is a zero frequency 
-    class when calcuating woe, it will replaced by 0.99/total_number.
+    class when calcuating woe, the zero will replaced by 0.99/total_number 
+    to make the woe calculable.
     
     Params
     ------
