@@ -1381,7 +1381,10 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
                 breaks = None
             else:
                 stop_limit = 0.1
-            breaks = woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, sv_i, method=method)
+            try:
+                breaks = woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, sv_i, method=method)
+            except:
+                pass
             # adj breaks again
             adj_brk = menu(i, xs_len, x_i)
         if adj_brk == 3:
