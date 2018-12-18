@@ -1,7 +1,9 @@
-# scorecardpy 0.1.7.1
+# scorecardpy 0.1.7.2
 
 * pdo in scorecard function now supports negative value.
 * fixed a bug in split_df when the input dataframe has a specified index.
+* split_df will not remove datetime and identical variables
+* added a one-hot encoding function 
 
 # scorecardpy 0.1.7
 

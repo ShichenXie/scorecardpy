@@ -6,6 +6,10 @@ import warnings
 import re
 from pandas.api.types import is_numeric_dtype
 
+def str_to_list(x):
+    if x is not None and isinstance(x, str):
+        x = [x]
+    return x
 # remove date time columns # rm_datetime_col
 # remove columns if len(x.unique()) == 1
 def rmcol_datetime_unique1(dat, check_char_num = False): # add more datatime types later
@@ -30,7 +34,7 @@ def rmcol_datetime_unique1(dat, check_char_num = False): # add more datatime typ
         warnings.warn("There are {} columns have only one unique values, which are removed from input dataset. \n (ColumnNames: {})".format(len(unique1_cols), ', '.join(unique1_cols)))
         dat=dat.drop(unique1_cols, axis=1)
     
-    # remove date time variable
+    # remove date time variable # isinstance
     datetime_cols = dat.dtypes[dat.dtypes == 'datetime64[ns]'].index.tolist()
     if len(datetime_cols) > 0:
         warnings.warn("There are {} date/time type columns are removed from input dataset. \n (ColumnNames: {})".format(len(datetime_cols), ', '.join(datetime_cols)))
@@ -68,8 +72,7 @@ def check_y(dat, y, positive):
         raise Exception("Incorrect inputs; dat should be a DataFrame with at least two columns.")
     
     # y ------
-    if isinstance(y, str):
-        y = [y]
+    y = str_to_list(y)
     # length of y == 1
     if len(y) != 1:
         raise Exception("Incorrect inputs; the length of y should be one")
@@ -119,15 +122,13 @@ def check_print_step(print_step):
 
 # x variable
 def x_variable(dat, y, x):
-    if isinstance(y, str):
-        y = [y]
+    y = str_to_list(y)
     x_all = list(set(dat.columns) - set(y))
     
     if x is None:
         x = x_all
     else:
-        if isinstance(x, str):
-            x = [x]
+        x = str_to_list(x)
             
         if any([i in list(x_all) for i in x]) is False:
             x = x_all
