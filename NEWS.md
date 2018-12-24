@@ -1,9 +1,10 @@
-# scorecardpy 0.1.7.2
+# scorecardpy 0.1.7.3
 
 * pdo in scorecard function now supports negative value.
 * fixed a bug in split_df when the input dataframe has a specified index.
 * split_df will not remove datetime and identical variables
 * added a one-hot encoding function 
+* fixed a bug in woebin using chimerge method for int64 variables, causing it cant trnasform into woe values 
 
 # scorecardpy 0.1.7
 

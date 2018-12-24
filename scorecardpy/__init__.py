@@ -11,7 +11,7 @@ from scorecardpy.scorecard import (scorecard, scorecard_ply)
 from scorecardpy.one_hot import one_hot
 
 
-__version__ = '0.1.7.2'
+__version__ = '0.1.7.3'
 
 __all__ = (
     germancredit,

@@ -277,7 +277,7 @@ def woebin2_init_bin(dtm, min_perc_fine_bin, breaks, spl_val):
     if dtm is None: return {'binning_sv':binning_sv, 'initial_binning':None}
     # binning
     if is_numeric_dtype(dtm['value']): # numeric variable
-        xvalue = dtm['value']
+        xvalue = dtm['value'].astype(float)
         # breaks vector & outlier
         iq = xvalue.quantile([0.25, 0.5, 0.75])
         iqr = iq[0.75] - iq[0.25]
@@ -1268,7 +1268,7 @@ def woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, sv_i, method):
     return breaks
     
     
-def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"):
+def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree"):
     '''
     WOE Binning Adjustment
     ------
@@ -1279,9 +1279,7 @@ def woebin_adj(dt, y, bins, adj_all_var=True, special_values=None, method="tree"
     dt: A data frame.
     y: Name of y variable.
     bins: A list or data frame. Binning information generated from woebin.
-    adj_all_var: Logical, default is TRUE. If it is TRUE, all variables 
-      need to adjust binning breaks, otherwise, only include the variables 
-      that have more then one inflection point.
+    adj_all_var: Logical, whether to show monotonic woe variables. Default is TRUE
     special_values: the values specified in special_values will in separate 
       bins. Default is NULL.
     method: optimal binning method, it should be "tree" or "chimerge". 
