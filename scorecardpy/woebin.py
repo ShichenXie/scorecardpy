@@ -9,6 +9,7 @@ import warnings
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 import time
+import os
 from .condition_fun import *
 from .info_value import *
 
@@ -482,6 +483,7 @@ def woebin2_tree(dtm, min_perc_fine_bin=0.02, min_perc_coarse_bin=0.05,
     IVchg = 1 ## IV gain ratio
     step_num = 1
     # best breaks from three to n+1 bins
+    binning_tree = None
     while (IVchg >= stop_limit) and (step_num+1 <= min([max_num_bin, len_brks])):
         binning_tree = woebin2_tree_add_1brkp(dtm, initial_binning, min_perc_coarse_bin, bestbreaks)
         # best breaks
@@ -712,11 +714,41 @@ def woebin2(dtm, breaks=None, spl_val=None,
     return binning_format(binning)
 
 
+def bins_to_breaks(bins, dt, to_string=False, save_string=None):
+    if isinstance(bins, dict):
+        bins = pd.concat(bins, ignore_index=True)
+
+    # x variables
+    xs_all = bins['variable'].unique()
+    # dtypes of  variables
+    vars_class = pd.DataFrame({
+      'variable': xs_all,
+      'not_numeric': [not is_numeric_dtype(dt[i]) for i in xs_all]
+    })
+    
+    # breakslist of bins
+    bins_breakslist = bins[~bins['breaks'].isin(["-inf","inf","missing"]) & ~bins['is_special_values']]
+    bins_breakslist = pd.merge(bins_breakslist[['variable', 'breaks']], vars_class, how='left', on='variable')
+    bins_breakslist.loc[bins_breakslist['not_numeric'], 'breaks'] = '\''+bins_breakslist.loc[bins_breakslist['not_numeric'], 'breaks']+'\''
+    bins_breakslist = bins_breakslist.groupby('variable')['breaks'].agg(lambda x: ','.join(x))
+    
+    if to_string:
+        bins_breakslist = "breaks_list={\n"+', \n'.join('\''+bins_breakslist.index[i]+'\': ['+bins_breakslist[i]+']' for i in np.arange(len(bins_breakslist)))+"}"
+        if save_string is not None:
+            brk_lst_name = '{}_{}.py'.format(save_string, time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time())))
+            with open(brk_lst_name, 'w') as f:
+                f.write(bins_breakslist)
+            print('[INFO] The breaks_list is saved as {}'.format(brk_lst_name))
+            return 
+    return bins_breakslist
+
+    
 
 def woebin(dt, y, x=None, breaks_list=None, special_values=None, 
            min_perc_fine_bin=0.02, min_perc_coarse_bin=0.05, 
            stop_limit=0.1, max_num_bin=8, 
-           positive="bad|1", no_cores=None, print_step=0, method="tree"):
+           positive="bad|1", no_cores=None, print_step=0, method="tree",
+           save_breaks_list=None):
     '''
     WOE Binning
     ------
@@ -728,20 +760,20 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     The default woe is defined as ln(Distr_Bad_i/Distr_Good_i). If you 
     prefer ln(Distr_Good_i/Distr_Bad_i), please set the argument `positive` 
     as negative value, such as '0' or 'good'. If there is a zero frequency 
-    class when calcuating woe, the zero will replaced by 0.99 to make the 
+    class when calculating woe, the zero will replaced by 0.99 to make the 
     woe calculable.
     
     Params
     ------
     dt: A data frame with both x (predictor/feature) and y (response/label) variables.
     y: Name of y variable.
-    x: Name of x variables. Default is NULL. If x is NULL, 
+    x: Name of x variables. Default is None. If x is None, 
       then all variables except y are counted as x variables.
-    breaks_list: List of break points, default is NULL. 
-      If it is not NULL, variable binning will based on the 
+    breaks_list: List of break points, default is None. 
+      If it is not None, variable binning will based on the 
       provided breaks.
     special_values: the values specified in special_values 
-      will be in separate bins. Default is NULL.
+      will be in separate bins. Default is None.
     min_perc_fine_bin: The minimum percentage of initial binning 
       class number over total. Accepted range: 0.01-0.2; default 
       is 0.02, which means initial binning into 50 fine bins for 
@@ -756,7 +788,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     max_num_bin: Integer. The maximum number of binning.
     positive: Value of positive class, default "bad|1".
     no_cores: Number of CPU cores for parallel computation. 
-      Defaults NULL. If no_cores is NULL, the no_cores will 
+      Defaults None. If no_cores is None, the no_cores will 
       set as 1 if length of x variables less than 10, and will 
       set as the number of all CPU cores if the length of x variables 
       greater than or equal to 10.
@@ -765,6 +797,7 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
       If print_step=0 or no_cores>1, no message is print.
     method: Optimal binning method, it should be "tree" or "chimerge". 
       Default is "tree".
+    save_breaks_list: The file name to save breaks_list. Default is None.
     
     Returns
     ------
@@ -903,6 +936,8 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     if (runingtime >= 10):
         # print(time.strftime("%H:%M:%S", time.gmtime(runingtime)))
         print('Binning on {} rows and {} columns in {}'.format(dt.shape[0], dt.shape[1], time.strftime("%H:%M:%S", time.gmtime(runingtime))))
+    if save_breaks_list is not None:
+        bins_to_breaks(bins, dt, to_string=True, save_string=save_breaks_list)
     # return
     return bins
 
@@ -973,7 +1008,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     dt: A data frame.
     bins: Binning information generated from `woebin`.
     no_cores: Number of CPU cores for parallel computation. 
-      Defaults NULL. If no_cores is NULL, the no_cores will 
+      Defaults None. If no_cores is None, the no_cores will 
       set as 1 if length of x variables less than 10, and will 
       set as the number of all CPU cores if the length of x 
       variables greater than or equal to 10.
@@ -1144,10 +1179,10 @@ def woebin_plot(bins, x=None, title=None, show_iv=True):
     Params
     ------
     bins: A list or data frame. Binning information generated by `woebin`.
-    x: Name of x variables. Default is NULL. If x is NULL, then all 
+    x: Name of x variables. Default is None. If x is None, then all 
       variables except y are counted as x variables.
-    title: String added to the plot title. Default is NULL.
-    show_iv: Logical. Default is TRUE, which means show information value 
+    title: String added to the plot title. Default is None.
+    show_iv: Logical. Default is True, which means show information value 
       in the plot title.
     
     Returns
@@ -1268,7 +1303,7 @@ def woebin_adj_break_plot(dt, y, x_i, breaks, stop_limit, sv_i, method):
     return breaks
     
     
-def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree"):
+def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree", save_breaks_list=None):
     '''
     WOE Binning Adjustment
     ------
@@ -1279,11 +1314,14 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
     dt: A data frame.
     y: Name of y variable.
     bins: A list or data frame. Binning information generated from woebin.
-    adj_all_var: Logical, whether to show monotonic woe variables. Default is TRUE
+    adj_all_var: Logical, whether to show monotonic woe variables. Default
+      is True
     special_values: the values specified in special_values will in separate 
-      bins. Default is NULL.
+      bins. Default is None.
     method: optimal binning method, it should be "tree" or "chimerge". 
       Default is "tree".
+    save_breaks_list: The file name to save breaks_list. Default is None.
+
     
     Returns
     ------
@@ -1316,7 +1354,7 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
     xs_all = bins['variable'].unique()
     # adjust all variables
     if not adj_all_var:
-        bins2 = bins.loc[bins['bin'] != 'missing'].reset_index(drop=True)
+        bins2 = bins.loc[~((bins['bin'] == 'missing') & (bins['count_distr'] >= 0.05))].reset_index(drop=True)
         bins2['badprob2'] = bins2.groupby('variable').apply(lambda x: x['badprob'].shift(1)).reset_index(drop=True)
         bins2 = bins2.dropna(subset=['badprob2']).reset_index(drop=True)
         bins2 = bins2.assign(badprob_trend = lambda x: x.badprob >= x.badprob2)
@@ -1328,16 +1366,9 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
     xs_len = len(xs_adj)
     # special_values
     special_values = check_special_values(special_values, xs_adj)
-    # dtypes of  variables
-    vars_class = pd.DataFrame({
-      'variable': [i for i in dt.columns],
-      'not_numeric': [not is_numeric_dtype(dt[i]) for i in dt.columns]
-    })
+    
     # breakslist of bins
-    bins_breakslist = bins[~bins['breaks'].isin(["-inf","inf","missing"])]
-    bins_breakslist = pd.merge(bins_breakslist[['variable', 'breaks']], vars_class, how='left', on='variable')
-    bins_breakslist.loc[bins_breakslist['not_numeric'], 'breaks'] = '\''+bins_breakslist.loc[bins_breakslist['not_numeric'], 'breaks']+'\''
-    bins_breakslist = bins_breakslist.groupby('variable')['breaks'].agg(lambda x: ','.join(x))
+    bins_breakslist = bins_to_breaks(bins,dt)
     # loop on adjusting variables
     if xs_len == 0:
         warnings.warn('The binning breaks of all variables are perfect according to default settings.')
@@ -1396,5 +1427,8 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
             i += 1
     # return 
     breaks_list = "{"+', '.join('\''+bins_breakslist.index[i]+'\': ['+bins_breakslist[i]+']' for i in np.arange(len(bins_breakslist)))+"}"
+    if save_breaks_list is not None:
+        bins_adj = woebin(dt, y, x=bins_breakslist.index, breaks_list=breaks_list)
+        bins_to_breaks(bins_adj, dt, to_string=True, save_string=save_breaks_list)
     return breaks_list
     
