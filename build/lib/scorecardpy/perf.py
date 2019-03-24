@@ -459,7 +459,7 @@ def perf_psi(score, label=None, title=None, x_limits=None, x_tick_break=50, show
         if label is not None:
             score[i].loc[:,'y'] = label[i]
         else:
-            score[i].copy(deep=True).loc[:,'y'] = np.nan
+            score[i].loc[:,'y'] = np.nan
     # dateset of score and label
     dt_sl = pd.concat(score, names=['ae', 'rowid']).reset_index()\
       .sample(frac=1, random_state=seed)
