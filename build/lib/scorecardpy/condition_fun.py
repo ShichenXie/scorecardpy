@@ -42,8 +42,10 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
 #'
 def check_y(dat, y, positive):
     # ncol of dt
-    if isinstance(dat, pd.DataFrame) & (dat.shape[1] <= 1): 
+    if not isinstance(dat, pd.DataFrame):
         raise Exception("Incorrect inputs; dat should be a DataFrame with at least two columns.")
+    elif dat.shape[1] <= 1:
+        raise Exception("Incorrect inputs; dat should be with at least two columns.")
     
     # y ------
     if isinstance(y, str):
