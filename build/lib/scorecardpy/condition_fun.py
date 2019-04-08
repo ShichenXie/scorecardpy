@@ -27,7 +27,7 @@ def rmcol_datetime_unique1(dat): # add more datatime types later
 #' @import data.table
 #'
 def rep_blank_na(dat): # cant replace blank string in categorical value with nan
-    blank_cols = [index for index, x in dat.isin(['', ' ']).sum().iteritems() if x > 0]
+    blank_cols = [i for i in list(dat) if dat[i].astype(str).str.findall(r'^\s*$').apply(lambda x:0 if len(x)==0 else 1).sum()>0]
     if len(blank_cols) > 0:
         warnings.warn('There are blank strings in {} columns, which are replaced with NaN. \n (ColumnNames: {})'.format(len(blank_cols), ', '.join(blank_cols)))
 #        dat[dat == [' ','']] = np.nan
