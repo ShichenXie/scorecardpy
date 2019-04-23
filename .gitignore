@@ -8,4 +8,4 @@
 /*.egg-info
 .Rproj.user
 .Rhistory
-
+*.Rproj

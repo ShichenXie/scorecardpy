@@ -52,7 +52,7 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
         dat = dat.reset_index()
         warnings.warn('There are duplicated index in dataset. The index has been reseted.')
     
-    blank_cols = [index for index, x in dat.isin(['', ' ']).sum().iteritems() if x > 0]
+    blank_cols = [i for i in list(dat) if dat[i].astype(str).str.findall(r'^\s*$').apply(lambda x:0 if len(x)==0 else 1).sum()>0]
     if len(blank_cols) > 0:
         warnings.warn('There are blank strings in {} columns, which are replaced with NaN. \n (ColumnNames: {})'.format(len(blank_cols), ', '.join(blank_cols)))
 #        dat[dat == [' ','']] = np.nan
@@ -68,8 +68,12 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
 def check_y(dat, y, positive):
     positive = str(positive)
     # ncol of dt
-    if isinstance(dat, pd.DataFrame) & (dat.shape[1] <= 1): 
+    if not isinstance(dat, pd.DataFrame):
+        raise Exception("Incorrect inputs; dat should be a DataFrame.")
+    elif dat.shape[1] <= 1:
         raise Exception("Incorrect inputs; dat should be a DataFrame with at least two columns.")
+
+
     
     # y ------
     y = str_to_list(y)
