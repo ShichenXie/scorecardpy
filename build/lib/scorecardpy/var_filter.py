@@ -77,7 +77,7 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
         var_kp2 = list(set(var_kp) & set(x))
         len_diff_var_kp = len(var_kp) - len(var_kp2)
         if len_diff_var_kp > 0:
-            warnings.warn("Incorrect inputs; there are {} var_kp variables are not exist in input data, which are removed from var_kp. \n {}".format(len_diff_var_kp, list(set(var_kp)-set(var_kp2))) )
+            warnings.warn("Incorrect inputs; there are {} var_kp variables are not exist in input data, which are removed from var_kp. \n {}".format(len_diff, list(set(var_kp)-set(var_kp2))) )
         var_kp = var_kp2 if len(var_kp2)>0 else None
   
     # -iv
