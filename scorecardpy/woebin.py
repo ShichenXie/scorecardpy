@@ -856,6 +856,8 @@ def woebin(dt, y, x=None, breaks_list=None, special_values=None,
     dt = rep_blank_na(dt)
     # check y
     dt = check_y(dt, y, positive)
+    # change boolean variables
+    dt[dt.select_dtypes(['object', 'bool']).columns.tolist()] = dt.select_dtypes(['object', 'bool']).astype('str')
     # x variable names
     xs = x_variable(dt,y,x)
     xs_len = len(xs)
