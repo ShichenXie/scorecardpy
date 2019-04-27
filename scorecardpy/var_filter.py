@@ -68,6 +68,8 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
     dt = rep_blank_na(dt)
+    # change boolean variables
+    dt[dt.select_dtypes(['object', 'bool']).columns.tolist()] = dt.select_dtypes(['object', 'bool']).astype('str')
     # check y
     dt = check_y(dt, y, positive)
     # x variable names
