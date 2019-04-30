@@ -986,8 +986,7 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
     if not is_string_dtype(dtx[x_i]):
         dtx.loc[:,x_i] = dtx.loc[:,x_i].astype(str).replace('nan', 'missing')
     # dtx.loc[:,x_i] = np.where(pd.isnull(dtx[x_i]), dtx[x_i], dtx[x_i].astype(str))
-    # dtx = dtx.replace(np.nan, 'missing').assign(rowid = dtx.index)
-    dtx = dtx.fillna('missing').assign(rowid = dtx.index).sort_values('rowid')
+    dtx = dtx.replace(np.nan, 'missing').assign(rowid = dtx.index).sort_values('rowid')
     # rename binx
     binx.columns = ['bin', x_i, '_'.join([x_i,woe_points])]
     # merge
