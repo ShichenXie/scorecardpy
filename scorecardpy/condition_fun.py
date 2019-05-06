@@ -35,7 +35,8 @@ def rmcol_datetime_unique1(dat, check_char_num = False): # add more datatime typ
         dat=dat.drop(unique1_cols, axis=1)
     
     # remove date time variable # isinstance
-    datetime_cols = dat.dtypes[dat.dtypes == 'datetime64[ns]'].index.tolist()
+    dat_time = dat.apply(pd.to_numeric,errors='ignore').select_dtypes(object).apply(pd.to_datetime,errors='ignore')
+    datetime_cols = dat_time.dtypes[dat_time.dtypes == 'datetime64[ns]'].index.tolist()
     if len(datetime_cols) > 0:
         warnings.warn("There are {} date/time type columns are removed from input dataset. \n (ColumnNames: {})".format(len(datetime_cols), ', '.join(datetime_cols)))
         dat=dat.drop(datetime_cols, axis=1)
