@@ -1052,7 +1052,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0):
     print('[INFO] converting into woe values ...')
     
     # remove date/time col
-    dt = rmcol_datetime_unique1(dt)
+    # dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # ncol of dt

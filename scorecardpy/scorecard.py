@@ -198,7 +198,7 @@ def scorecard_ply(dt, card, only_total_score=True, print_step=0):
   
     dt = dt.copy(deep=True)
     # remove date/time col
-    dt = rmcol_datetime_unique1(dt)
+    # dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
     dt = rep_blank_na(dt)
     # print_step
