@@ -65,9 +65,9 @@ def var_filter(dt, y, x=None, iv_limit=0.02, missing_limit=0.95,
     if x is not None: 
         dt = dt[y+x]
     # remove date/time col
-    dt = rmcol_datetime_unique1(dt)
+#    dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
-    dt = rep_blank_na(dt)
+#    dt = rep_blank_na(dt)
     # check y
     dt = check_y(dt, y, positive)
     # x variable names
