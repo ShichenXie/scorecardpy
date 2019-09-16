@@ -772,15 +772,12 @@ def woebin(dt, y, x=None,
     y: Name of y variable.
     x: Name of x variables. Default is None. If x is None, 
       then all variables except y are counted as x variables.
+    var_skip: Name of variables that will skip for binning. Defaults to None.
     breaks_list: List of break points, default is None. 
       If it is not None, variable binning will based on the 
       provided breaks.
     special_values: the values specified in special_values 
       will be in separate bins. Default is None.
-    init_count_distr: The minimum percentage of initial binning 
-      class number over total. Accepted range: 0.01-0.2; default 
-      is 0.02, which means initial binning into 50 fine bins for 
-      continuous variables.
     count_distr_limit: The minimum percentage of final binning 
       class number over total. Accepted range: 0.01-0.2; default 
       is 0.05.
@@ -800,6 +797,12 @@ def woebin(dt, y, x=None,
       If print_step=0 or no_cores>1, no message is print.
     method: Optimal binning method, it should be "tree" or "chimerge". 
       Default is "tree".
+    ignore_const_cols: Logical. Ignore constant columns. Defaults to True.
+    ignore_datetime_cols: Logical. Ignore datetime columns. Defaults to True.
+    check_cate_num: Logical. Check whether the number of unique values in 
+      categorical columns larger than 50. It might make the binning process slow 
+      if there are too many unique categories. Defaults to True.
+    replace_blank: Logical. Replace blank values with None. Defaults to True.
     save_breaks_list: The file name to save breaks_list. Default is None.
     
     Returns
@@ -1038,6 +1041,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
     print_step: A non-negative integer. Default is 1. If 
       print_step>0, print variable names by each print_step-th 
       iteration. If print_step=0 or no_cores>1, no message is print.
+    replace_blank: Logical. Replace blank values with None. Defaults to True.
     
     Returns
     -------
@@ -1346,6 +1350,9 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
     method: optimal binning method, it should be "tree" or "chimerge". 
       Default is "tree".
     save_breaks_list: The file name to save breaks_list. Default is None.
+    count_distr_limit: The minimum percentage of final binning 
+      class number over total. Accepted range: 0.01-0.2; default 
+      is 0.05.
 
     
     Returns
