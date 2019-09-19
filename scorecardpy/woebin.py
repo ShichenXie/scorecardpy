@@ -10,6 +10,7 @@ import multiprocessing as mp
 import matplotlib.pyplot as plt
 import time
 import os
+import platform
 from .condition_fun import *
 from .info_value import *
 
@@ -945,6 +946,8 @@ def woebin(dt, y, x=None,
             # try catch:
             # "The variable '{}' caused the error: '{}'".format(x_i, error-info)
     else:
+        if platform.system() == 'Windows': 
+            mp.freeze_support()
         pool = mp.Pool(processes=no_cores)
         # arguments
         args = zip(
@@ -1120,6 +1123,8 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
             dtx = dt[[x_i]]
             dat = pd.concat([dat, woepoints_ply1(dtx, binx, x_i, woe_points="woe")], axis=1)
     else:
+        if platform.system() == 'Windows': 
+            mp.freeze_support()
         pool = mp.Pool(processes=no_cores)
         # arguments
         args = zip(
