@@ -1272,7 +1272,7 @@ def woebin_plot(bins, x=None, title=None, show_iv=True):
 # print basic information in woebin_adj
 def woebin_adj_print_basic_info(i, xs, bins, dt, bins_breakslist):
     '''
-    print basci information of woebinnig in adjusting process
+    print basic information of woebinnig in adjusting process
     
     Params
     ------
