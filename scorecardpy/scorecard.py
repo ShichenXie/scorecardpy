@@ -134,7 +134,7 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
 
 
 
-def scorecard_ply(dt, card, only_total_score=True, print_step=0):
+def scorecard_ply(dt, card, only_total_score=True, print_step=0, replace_blank_na=True, var_kp = None):
     '''
     Score Transformation
     ------
@@ -151,6 +151,9 @@ def scorecard_ply(dt, card, only_total_score=True, print_step=0):
     print_step: A non-negative integer. Default is 1. If print_step>0, 
       print variable names by each print_step-th iteration. If 
       print_step=0, no message is print.
+    replace_blank_na: Logical. Replace blank values with NA. Defaults to True. 
+      This parameter should be the same with woebin's.
+    var_kp: Name of force kept variables, such as id column. Defaults to None.
     
     Return
     ------
@@ -200,12 +203,14 @@ def scorecard_ply(dt, card, only_total_score=True, print_step=0):
     # remove date/time col
     # dt = rmcol_datetime_unique1(dt)
     # replace "" by NA
-    dt = rep_blank_na(dt)
+    if replace_blank_na: dt = rep_blank_na(dt)
     # print_step
     print_step = check_print_step(print_step)
     # card # if (is.list(card)) rbindlist(card)
     if isinstance(card, dict):
         card_df = pd.concat(card, ignore_index=True)
+    elif isinstance(card, pd.DataFrame):
+        card_df = card.copy(deep=True)
     # x variables
     xs = card_df.loc[card_df.variable != 'basepoints', 'variable'].unique()
     # length of x variables
@@ -234,6 +239,17 @@ def scorecard_ply(dt, card, only_total_score=True, print_step=0):
     # dat_score = dat_score.assign(score = lambda x: card_basepoints + dat_score.sum(axis=1))
     # return
     if only_total_score: dat_score = dat_score[['score']]
+    
+    # check force kept variables
+    if var_kp is not None:
+        if isinstance(var_kp, str):
+            var_kp = [var_kp]
+        var_kp2 = list(set(var_kp) & set(list(dt)))
+        len_diff_var_kp = len(var_kp) - len(var_kp2)
+        if len_diff_var_kp > 0:
+            warnings.warn("Incorrect inputs; there are {} var_kp variables are not exist in input data, which are removed from var_kp. \n {}".format(len_diff_var_kp, list(set(var_kp)-set(var_kp2))) )
+        var_kp = var_kp2 if len(var_kp2)>0 else None
+    if var_kp is not None: dat_score = pd.concat([dat_score, dt[var_kp]], axis = 1)
     return dat_score
     
     

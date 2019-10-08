@@ -1,3 +1,7 @@
+# scorecardpy 0.1.8.2
+* fixed a bug in scorecard_ply, supports card as a DataFrame
+* fixed a bug in woebin when using parallel in windows
+
 # scorecardpy 0.1.8
 
 * pdo in scorecard function now supports negative value.
