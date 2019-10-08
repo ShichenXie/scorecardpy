@@ -249,7 +249,7 @@ def scorecard_ply(dt, card, only_total_score=True, print_step=0, replace_blank_n
         if len_diff_var_kp > 0:
             warnings.warn("Incorrect inputs; there are {} var_kp variables are not exist in input data, which are removed from var_kp. \n {}".format(len_diff_var_kp, list(set(var_kp)-set(var_kp2))) )
         var_kp = var_kp2 if len(var_kp2)>0 else None
-    if var_kp is not None: dat_score = pd.concat([dat_score, dt[var_kp]], axis = 1)
+    if var_kp is not None: dat_score = pd.concat([dt[var_kp], dat_score], axis = 1)
     return dat_score
     
     
