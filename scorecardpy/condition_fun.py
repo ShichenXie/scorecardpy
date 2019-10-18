@@ -105,7 +105,7 @@ def check_print_step(print_step):
 
 # x variable
 def x_variable(dat, y, x):
-    x_all = set(list(dat)).difference(set([y]))
+    x_all = dat.columns.difference([y]).tolist() #set(list(dat)).difference(set([y]))
     
     if x is None:
         x = x_all
@@ -125,7 +125,7 @@ def x_variable(dat, y, x):
 
 
 # check breaks_list
-def check_breaks_list(breaks_list, xs):
+def check_breaks_list(breaks_list):
     if breaks_list is not None:
         # is string
         if isinstance(breaks_list, str):
@@ -134,7 +134,6 @@ def check_breaks_list(breaks_list, xs):
         if not isinstance(breaks_list, dict):
             raise Exception("Incorrect inputs; breaks_list should be a dict.")
     return breaks_list
-
 
 # check special_values
 def check_special_values(special_values, xs):
@@ -152,3 +151,25 @@ def check_special_values(special_values, xs):
             raise Exception("Incorrect inputs; special_values should be a list or dict.")
     return special_values
 
+# check monotonic_variables
+def check_monotonic_variables(dat,y,monotonic_variables):
+    variables = dat.columns.difference([y]).tolist()
+    if monotonic_variables:
+        # 列表
+        if not isinstance(monotonic_variables,str) and not isinstance(monotonic_variables,list):
+            warnings.warn("Incorrect inputs,The monotonic_variables should be a list or str.")
+            monotonic_variables = []
+        elif isinstance(monotonic_variables,str):
+            monotonic_variables = [monotonic_variables]
+
+        # 是否包含
+        if not set(monotonic_variables).issubset(set(variables)):
+            warnings.warn("Incorrect inputs,There are {} not in exist in input data".format(set(i for i in monotonic_variables if i not in variables)))
+            monotonic_variables = [i for i in monotonic_variables if i in variables]
+    return monotonic_variables
+
+# check dataFrame
+def check_dat(dat):
+    if not isinstance(dat,pd.DataFrame):
+        raise Exception("Incorrect inputs; dat should be a DataFrame.")
+    return dat
