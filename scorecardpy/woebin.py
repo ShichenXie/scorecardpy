@@ -918,8 +918,11 @@ def woebin(dt, y, x=None,
     # binning for each x variable
     # loop on xs
     if (no_cores is None) or (no_cores < 1):
-        no_cores = 1 if xs_len<10 else mp.cpu_count()
-    
+        all_cores = mp.cpu_count() - 1
+        no_cores = np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9)
+    if platform.system() == 'Windows': 
+        no_cores = 1
+            
     # ylist to str
     y = y[0]
     # binning for variables
@@ -946,8 +949,6 @@ def woebin(dt, y, x=None,
             # try catch:
             # "The variable '{}' caused the error: '{}'".format(x_i, error-info)
     else:
-        if platform.system() == 'Windows': 
-            mp.freeze_support()
         pool = mp.Pool(processes=no_cores)
         # arguments
         args = zip(
@@ -1106,7 +1107,11 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
     
     # loop on xs
     if (no_cores is None) or (no_cores < 1):
-        no_cores = 1 if xs_len<10 else mp.cpu_count()
+        all_cores = mp.cpu_count() - 1
+        no_cores = np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9)
+    if platform.system() == 'Windows': 
+        no_cores = 1
+            
     # 
     if no_cores == 1:
         for i in np.arange(xs_len):
@@ -1123,8 +1128,6 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
             dtx = dt[[x_i]]
             dat = pd.concat([dat, woepoints_ply1(dtx, binx, x_i, woe_points="woe")], axis=1)
     else:
-        if platform.system() == 'Windows': 
-            mp.freeze_support()
         pool = mp.Pool(processes=no_cores)
         # arguments
         args = zip(
