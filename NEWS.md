@@ -1,4 +1,4 @@
-# scorecardpy 0.1.8.2
+# scorecardpy 0.1.9
 * fixed a bug in scorecard_ply, supports card as a DataFrame
 * fixed a bug in woebin when using parallel in windows
 

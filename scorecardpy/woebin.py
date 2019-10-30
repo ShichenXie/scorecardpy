@@ -919,7 +919,7 @@ def woebin(dt, y, x=None,
     # loop on xs
     if (no_cores is None) or (no_cores < 1):
         all_cores = mp.cpu_count() - 1
-        no_cores = np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9)
+        no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))
     if platform.system() == 'Windows': 
         no_cores = 1
             
@@ -1108,7 +1108,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
     # loop on xs
     if (no_cores is None) or (no_cores < 1):
         all_cores = mp.cpu_count() - 1
-        no_cores = np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9)
+        no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))
     if platform.system() == 'Windows': 
         no_cores = 1
             
