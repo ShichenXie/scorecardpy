@@ -411,7 +411,10 @@ def woebin2_tree_add_1brkp(dtm, initial_binning, count_distr_limit, bestbreaks=N
         if bestbreaks is None:
             bestbreaks_inf = [float('-inf'),float('inf')]
         else:
+            if not is_numeric_dtype(dtm['value']):
+                bestbreaks = [i for i in bestbreaks if int(i) != min(initial_binning.brkp)]
             bestbreaks_inf = [float('-inf')]+sorted(bestbreaks)+[float('inf')]
+        
         labels = ['[{},{})'.format(bestbreaks_inf[i], bestbreaks_inf[i+1]) for i in range(len(bestbreaks_inf)-1)]
         binning_1bst_brk = initial_binning.assign(
           bstbin = lambda x: pd.cut(x['brkp'], bestbreaks_inf, right=False, labels=labels)
@@ -574,13 +577,18 @@ def woebin2_chimerge(dtm, init_count_distr=0.02, count_distr_limit=0.05,
     bin_list = woebin2_init_bin(dtm, init_count_distr=init_count_distr, breaks=breaks, spl_val=spl_val)
     initial_binning = bin_list['initial_binning']
     binning_sv = bin_list['binning_sv']
+    # return initial binning if its row number equals 1
+    if len(initial_binning.index)==1: 
+        return {'binning_sv':binning_sv, 'binning':initial_binning}
+
     # dtm_rows
-    dtm_rows = len(dtm.index)
+    dtm_rows = len(dtm.index)    
     # chisq limit
     from scipy.special import chdtri
     chisq_limit = chdtri(1, stop_limit)
     # binning with chisq column
     binning_chisq = add_chisq(initial_binning)
+    
     # param
     bin_chisq_min = binning_chisq.chisq.min()
     bin_count_distr_min = min(binning_chisq['count']/dtm_rows)
@@ -601,6 +609,8 @@ def woebin2_chimerge(dtm, init_count_distr=0.02, count_distr_limit=0.05,
             rm_brkp = rm_brkp.sort_values(by=['count_distr']).iloc[0,]
         elif bin_nrow > bin_num_limit:
             rm_brkp = binning_chisq.assign(merge_tolead = False).sort_values(by=['chisq', 'count']).iloc[0,]
+        else:
+            break
         # set brkp to lead's or lag's
         shift_period = -1 if rm_brkp['merge_tolead'] else 1
         binning_chisq = binning_chisq.assign(brkp2  = lambda x: x['brkp'].shift(shift_period))\
@@ -617,9 +627,12 @@ def woebin2_chimerge(dtm, init_count_distr=0.02, count_distr_limit=0.05,
         ## add chisq to new binning dataframe
         binning_chisq = add_chisq(binning_chisq)
         ## param
+        bin_nrow = len(binning_chisq.index)
+        if bin_nrow == 1:
+            break
         bin_chisq_min = binning_chisq.chisq.min()
         bin_count_distr_min = min(binning_chisq['count']/dtm_rows)
-        bin_nrow = len(binning_chisq.index)
+        
     # format init_bin # remove (.+\\)%,%\\[.+,)
     if is_numeric_dtype(dtm['value']):
         binning_chisq = binning_chisq\
@@ -988,12 +1001,12 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
     '''
     # woe_points: "woe" "points"
     # binx = bins.loc[lambda x: x.variable == x_i] 
+    # https://stackoverflow.com/questions/12680754/split-explode-pandas-dataframe-string-entry-to-separate-rows
     binx = pd.merge(
-      pd.DataFrame(binx['bin'].str.split('%,%').tolist(), index=binx['bin'])\
-        .stack().reset_index().drop('level_1', axis=1),
+      binx[['bin']].assign(v1=binx['bin'].str.split('%,%')).explode('v1'),
       binx[['bin', woe_points]],
       how='left', on='bin'
-    ).rename(columns={0:'V1',woe_points:'V2'})
+    ).rename(columns={'v1':'V1',woe_points:'V2'})
     
     # dtx
     ## cut numeric variable
@@ -1110,7 +1123,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
         all_cores = mp.cpu_count() - 1
         no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))
     if platform.system() == 'Windows': 
-        no_cores = 1
+        no_cores = 1 
             
     # 
     if no_cores == 1:

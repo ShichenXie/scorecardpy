@@ -1,3 +1,7 @@
+# scorecardpy 0.1.9.1
+* fixed a bug in woebin function caused by the new function explode in pandas >= 0.25
+
+
 # scorecardpy 0.1.9
 * fixed a bug in scorecard_ply, supports card as a DataFrame
 * fixed a bug in woebin when using parallel in windows
