@@ -58,7 +58,7 @@ setup(
     ],
     keywords='credit scorecard, woe binning, performace evaluation',  # Optional
     packages=['scorecardpy'],  # Required
-    install_requires=['numpy','pandas>=0.22.0','matplotlib','scikit-learn>=0.19.1'],  # Optional
+    install_requires=['numpy','pandas>=0.25.0','matplotlib','scikit-learn>=0.19.1'],  # Optional
     package_data={'scorecardpy': ['data/*.csv']},
     # data_files=[('scorecardpy': ['data/*.csv'])],  # Optional
     project_urls={  # Optional
