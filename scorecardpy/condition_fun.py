@@ -54,7 +54,7 @@ def check_cateCols_uniqueValues(dat, var_skip = None):
 def rep_blank_na(dat): # cant replace blank string in categorical value with nan
     # remove duplicated index
     if dat.index.duplicated().any():
-        dat = dat.reset_index()
+        dat = dat.reset_index(drop = True)
         warnings.warn('There are duplicated index in dataset. The index has been reseted.')
     
     blank_cols = [i for i in list(dat) if dat[i].astype(str).str.findall(r'^\s*$').apply(lambda x:0 if len(x)==0 else 1).sum()>0]
