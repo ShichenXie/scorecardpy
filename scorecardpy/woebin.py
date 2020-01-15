@@ -71,7 +71,7 @@ def add_missing_spl_val(dtm, breaks, spl_val):
         else:
             if spl_val is None:
                 spl_val=['missing']
-            elif any([('missing' in i) for i in spl_val]):
+            elif any([('missing' in str(i)) for i in spl_val]):
                 spl_val=spl_val
             else:
                 spl_val=['missing']+spl_val
@@ -291,7 +291,7 @@ def woebin2_init_bin(dtm, init_count_distr, breaks, spl_val):
         # initial breaks
         brk = np.unique(xvalue_rm_outlier) if len_uniq_x < 10 else pretty(min(xvalue_rm_outlier), max(xvalue_rm_outlier), n)
         
-        brk = list(filter(lambda x: x>np.nanmin(xvalue) and x<np.nanmax(xvalue), brk))
+        brk = list(filter(lambda x: x>np.nanmin(xvalue) and x<=np.nanmax(xvalue), brk))
         brk = [float('-inf')] + sorted(brk) + [float('inf')]
         # initial binning datatable
         # cut
@@ -914,7 +914,7 @@ def woebin(dt, y, x=None,
     # init_count_distr range
     if init_count_distr<0.01 or init_count_distr>0.2 or not isinstance(init_count_distr, (float, int)):
         warnings.warn("Incorrect parameter specification; accepted init_count_distr parameter range is 0.01-0.2. Parameter was set to default (0.02).")
-        stop_limit = 0.02
+        init_count_distr = 0.02
     # count_distr_limit
     if count_distr_limit<0.01 or count_distr_limit>0.2 or not isinstance(count_distr_limit, (float, int)):
         warnings.warn("Incorrect parameter specification; accepted count_distr_limit parameter range is 0.01-0.2. Parameter was set to default (0.05).")
