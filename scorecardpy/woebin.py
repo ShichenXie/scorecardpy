@@ -281,9 +281,9 @@ def woebin2_init_bin(dtm, init_count_distr, breaks, spl_val):
     if is_numeric_dtype(dtm['value']): # numeric variable
         xvalue = dtm['value'].astype(float)
         # breaks vector & outlier
-        iq = xvalue.quantile([0.25, 0.5, 0.75])
+        iq = xvalue.quantile([init_count_distr, 0.25, 0.75, 1-init_count_distr])
         iqr = iq[0.75] - iq[0.25]
-        xvalue_rm_outlier = xvalue if iqr == 0 else xvalue[(xvalue >= iq[0.25]-3*iqr) & (xvalue <= iq[0.75]+3*iqr)]
+        xvalue_rm_outlier = xvalue[(xvalue >= iq[init_count_distr]-3*iqr) & (xvalue <= iq[1-init_count_distr]+3*iqr)]
         # number of initial binning
         n = np.trunc(1/init_count_distr)
         len_uniq_x = len(np.unique(xvalue_rm_outlier))

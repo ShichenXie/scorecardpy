@@ -1,6 +1,7 @@
 # scorecardpy 0.1.9.2
 * fixed a bug in woebin function caused by the new function explode in pandas >= 0.25
 * fixed a bug when intialzing binning
+* modified the method to create initial fine binning breaks.
 
 # scorecardpy 0.1.9
 * fixed a bug in scorecard_ply, supports card as a DataFrame
