@@ -92,7 +92,7 @@ def check_y(dat, y, positive):
         raise Exception("Incorrect inputs; there is no \'{}\' column in dat.".format(y))
     
     # remove na in y
-    if pd.isna(dat[y]).any():
+    if dat[y].isnull().any():
         warnings.warn("There are NaNs in \'{}\' column. The rows with NaN in \'{}\' were removed from dat.".format(y,y))
         dat = dat.dropna(subset=[y])
         # dat = dat[pd.notna(dat[y])]
