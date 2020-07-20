@@ -1221,7 +1221,7 @@ def plot_bin(binx, title, show_iv):
     plt.xticks(ind, binx['bin'])
     plt.title(title_string, loc='left')
     plt.legend((p2[0], p1[0]), ('bad', 'good'), loc='upper right')
-    fig.tight_layouts()
+    plt.tight_layouts()
     # show plot 
     # plt.show()
     return fig
