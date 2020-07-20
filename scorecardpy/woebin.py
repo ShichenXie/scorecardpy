@@ -1222,6 +1222,7 @@ def plot_bin(binx, title, show_iv, orientation):
     plt.title(title_string, loc='left')
     plt.legend((p2[0], p1[0]), ('bad', 'good'), loc='upper right')
     plt.tight_layouts()
+    ## new
     # show plot 
     # plt.show()
     return fig
