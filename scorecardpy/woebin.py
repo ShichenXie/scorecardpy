@@ -1212,6 +1212,7 @@ def plot_bin(binx, title, show_iv):
     for i in ind:
         ax2.text(i, binx.loc[i,'badprob']*1.02, str(round(binx.loc[i,'badprob']*100,1))+'%', color='blue', ha='center')
     # settings
+    ax1.tick_params(axis='x', rotation = 90)
     ax1.set_ylabel('Bin count distribution')
     ax2.set_ylabel('Bad probability', color='blue')
     ax1.set_yticks(np.arange(0, y_left_max+0.2, 0.2))
@@ -1220,6 +1221,7 @@ def plot_bin(binx, title, show_iv):
     plt.xticks(ind, binx['bin'])
     plt.title(title_string, loc='left')
     plt.legend((p2[0], p1[0]), ('bad', 'good'), loc='upper right')
+    fig.tight_layouts()
     # show plot 
     # plt.show()
     return fig
