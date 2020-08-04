@@ -10,6 +10,7 @@ import multiprocessing as mp
 import matplotlib.pyplot as plt
 import time
 import os
+import sys
 import platform
 from .condition_fun import *
 from .info_value import *
@@ -941,7 +942,7 @@ def woebin(dt, y, x=None,
             print('WARNING: To use multi-core computation on Windows, make sure your main module was safely imported using "if __name__ == \'__main__\'"')
             join=input('Are you sure to move on?[Y/N]')
             if join.lower() != 'y':
-                os._exit()
+                sys.exit(0)
         else:
             no_cores = 1
     
@@ -1138,7 +1139,7 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
             print('WARNING: To use multi-core computation on Windows, make sure your main module was safely imported using "if __name__ == \'__main__\'"')
             join=input('Are you sure to move on?[Y/N]')
             if join.lower() != 'y':
-                os._exit()
+                sys.exit(0)
         else:
             no_cores = 1
     
