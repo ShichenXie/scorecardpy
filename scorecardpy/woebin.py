@@ -936,11 +936,19 @@ def woebin(dt, y, x=None,
     ### ### 
     # binning for each x variable
     # loop on xs
-    if (no_cores is None) or (no_cores < 1):
-        all_cores = mp.cpu_count() - 1
-        no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))
-    if platform.system() == 'Windows': 
-        no_cores = 1
+    if platform.system() == 'Windows':
+        if (no_cores is not None) and (no_cores > 1):
+            print('WARNING: To use multi-core computation on Windows, make sure your main module was safely imported using "if __name__ == \'__main__\'"')
+            join=input('Are you sure to move on?[Y/N]')
+            if join.lower() != 'y':
+                os._exit()
+        else:
+            no_cores = 1
+    
+    else:
+        if (no_cores is None) or (no_cores < 1):
+            all_cores = mp.cpu_count() - 1
+            no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))
             
     # ylist to str
     y = y[0]
@@ -1125,12 +1133,21 @@ def woebin_ply(dt, bins, no_cores=None, print_step=0, replace_blank=True, **kwar
     dat = dt.loc[:,list(set(xs_dt) - set(xs))]
     
     # loop on xs
-    if (no_cores is None) or (no_cores < 1):
-        all_cores = mp.cpu_count() - 1
-        no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))
-    if platform.system() == 'Windows': 
-        no_cores = 1 
-            
+    if platform.system() == 'Windows':
+        if (no_cores is not None) and (no_cores > 1):
+            print('WARNING: To use multi-core computation on Windows, make sure your main module was safely imported using "if __name__ == \'__main__\'"')
+            join=input('Are you sure to move on?[Y/N]')
+            if join.lower() != 'y':
+                os._exit()
+        else:
+            no_cores = 1
+    
+    else:
+        if (no_cores is None) or (no_cores < 1):
+            all_cores = mp.cpu_count() - 1
+            no_cores = int(np.ceil(xs_len/5 if xs_len/5 < all_cores else all_cores*0.9))            
+
+
     # 
     if no_cores == 1:
         for i in np.arange(xs_len):
