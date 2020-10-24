@@ -39,7 +39,7 @@ def ab(points0=600, odds0=1/19, pdo=50):
 
 
 
-def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints_eq0=False):
+def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints_eq0=False, digits=0):
     '''
     Creating a Scorecard
     ------
@@ -55,6 +55,9 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
     pdo: Points to Double the Odds, default 50.
     basepoints_eq0: Logical, default is FALSE. If it is TRUE, the 
       basepoints will equally distribute to each variable.
+    digits: The number of digits after the decimal point for points 
+      calculation. Default 0.
+    
     
     Returns
     ------
@@ -122,13 +125,13 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
         card['basepoints'] = pd.DataFrame({'variable':"basepoints", 'bin':np.nan, 'points':0}, index=np.arange(1))
         for i in coef_df.index:
             card[i] = bins.loc[bins['variable']==i,['variable', 'bin', 'woe']]\
-              .assign(points = lambda x: round(-b*x['woe']*coef_df[i] + basepoints/len_x))\
+              .assign(points = lambda x: round(-b*x['woe']*coef_df[i] + basepoints/len_x), ndigits=digits)\
               [["variable", "bin", "points"]]
     else:
-        card['basepoints'] = pd.DataFrame({'variable':"basepoints", 'bin':np.nan, 'points':round(basepoints)}, index=np.arange(1))
+        card['basepoints'] = pd.DataFrame({'variable':"basepoints", 'bin':np.nan, 'points':round(basepoints, ndigits=digits)}, index=np.arange(1))
         for i in coef_df.index:
             card[i] = bins.loc[bins['variable']==i,['variable', 'bin', 'woe']]\
-              .assign(points = lambda x: round(-b*x['woe']*coef_df[i]))\
+              .assign(points = lambda x: round(-b*x['woe']*coef_df[i]), ndigits=digits)\
               [["variable", "bin", "points"]]
     return card
 
