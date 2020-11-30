@@ -841,7 +841,7 @@ def woebin(dt, y, x=None,
     # Example I
     # binning of two variables in germancredit dataset
     bins_2var = sc.woebin(dat, y = "creditability", 
-      x = ["credit.amount", "purpose"])
+      x = ["credit_amount", "purpose"])
     
     # Example II
     # binning of the germancredit dataset
@@ -853,16 +853,16 @@ def woebin(dt, y, x=None,
     dat_nan = pd.concat([dat, dat2], ignore_index=True)
     
     breaks_list = {
-      'age.in.years': [26, 35, 37, "Inf%,%missing"],
+      'age_in_years': [26, 35, 37, "Inf%,%missing"],
       'housing': ["own", "for free%,%rent"]
     }
     special_values = {
-      'credit.amount': [2600, 9960, "6850%,%missing"],
+      'credit_amount': [2600, 9960, "6850%,%missing"],
       'purpose': ["education", "others%,%missing"]
     }
     
     bins_cus_brk = sc.woebin(dat_nan, y="creditability",
-      x=["age.in.years","credit.amount","housing","purpose"],
+      x=["age_in_years","credit_amount","housing","purpose"],
       breaks_list=breaks_list, special_values=special_values)
     '''
     # start time

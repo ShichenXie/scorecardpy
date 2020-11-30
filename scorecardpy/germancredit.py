@@ -34,21 +34,21 @@ def germancredit():
     '''
     DATA_FILE = pkg_resources.resource_filename('scorecardpy', 'data/germancredit.csv')
     
-    dat = pd.read_csv(DATA_FILE)
+    dat = pd.read_csv('./scorecardpy/data/germancredit.csv')
     # categorical levels
     cate_levels = {
-            "status.of.existing.checking.account": ['... < 0 DM', '0 <= ... < 200 DM', '... >= 200 DM / salary assignments for at least 1 year', 'no checking account'], 
-            "credit.history": ["no credits taken/ all credits paid back duly", "all credits at this bank paid back duly", "existing credits paid back duly till now", "delay in paying off in the past", "critical account/ other credits existing (not at this bank)"], 
-            "savings.account.and.bonds": ["... < 100 DM", "100 <= ... < 500 DM", "500 <= ... < 1000 DM", "... >= 1000 DM", "unknown/ no savings account"],
-            "present.employment.since": ["unemployed", "... < 1 year", "1 <= ... < 4 years", "4 <= ... < 7 years", "... >= 7 years"], 
-            "personal.status.and.sex": ["male : divorced/separated", "female : divorced/separated/married", "male : single", "male : married/widowed", "female : single"], 
-            "other.debtors.or.guarantors": ["none", "co-applicant", "guarantor"], 
+            "status_of_existing_checking_account": ['... < 0 DM', '0 <= ... < 200 DM', '... >= 200 DM / salary assignments for at least 1 year', 'no checking account'], 
+            "credit_history": ["no credits taken/ all credits paid back duly", "all credits at this bank paid back duly", "existing credits paid back duly till now", "delay in paying off in the past", "critical account/ other credits existing (not at this bank)"], 
+            "savings_account_and_bonds": ["... < 100 DM", "100 <= ... < 500 DM", "500 <= ... < 1000 DM", "... >= 1000 DM", "unknown/ no savings account"],
+            "present_employment_since": ["unemployed", "... < 1 year", "1 <= ... < 4 years", "4 <= ... < 7 years", "... >= 7 years"], 
+            "personal_status_and_sex": ["male : divorced/separated", "female : divorced/separated/married", "male : single", "male : married/widowed", "female : single"], 
+            "other_debtors_or_guarantors": ["none", "co-applicant", "guarantor"], 
             "property": ["real estate",  "building society savings agreement/ life insurance",  "car or other, not in attribute Savings account/bonds",  "unknown / no property"],
-            "other.installment.plans": ["bank", "stores", "none"],
+            "other_installment_plans": ["bank", "stores", "none"],
             "housing": ["rent", "own", "for free"], 
             "job": ["unemployed/ unskilled - non-resident", "unskilled - resident", "skilled employee / official", "management/ self-employed/ highly qualified employee/ officer"],
             "telephone": ["none", "yes, registered under the customers name"], 
-            "foreign.worker": ["yes", "no"]}
+            "foreign_worker": ["yes", "no"]}
     # func of cate
     def cate_type(levels):
         return CategoricalDtype(categories=levels, ordered=True)
@@ -79,14 +79,14 @@ y = dat['creditability']
 
 # x
 # numerical data
-xvar =  "credit.amount" # "foreign.worker # 'age.in.years' #'number.of.existing.credits.at.this.bank' # 
+xvar =  "credit_amount" # "foreign_worker # 'age_in_years' #'number_of_existing_credits_at_this_bank' # 
 x= dat1[xvar]
 spl_val = [2600, 9960, "6850%,%missing"]
 breaks = [2000, 4000, 6000]
 breaks = ['26%,%missing', 28, 35, 37]
 
 # categorical data
-xvar= 'purpose'#'housing' # "job" # "credit.amount"; #
+xvar= 'purpose'#'housing' # "job" # "credit_amount"; #
 x= dat[xvar] # pd.Categorical(dat[xvar], categories=['rent', 'own','for free']) 
 breaks = ["own", "for free%,%rent%,%missing"]
 breaks = ["own", "for free%,%rent"]
