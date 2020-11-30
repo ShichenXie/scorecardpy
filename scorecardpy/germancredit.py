@@ -34,7 +34,7 @@ def germancredit():
     '''
     DATA_FILE = pkg_resources.resource_filename('scorecardpy', 'data/germancredit.csv')
     
-    dat = pd.read_csv('./scorecardpy/data/germancredit.csv')
+    dat = pd.read_csv(DATA_FILE)
     # categorical levels
     cate_levels = {
             "status_of_existing_checking_account": ['... < 0 DM', '0 <= ... < 200 DM', '... >= 200 DM / salary assignments for at least 1 year', 'no checking account'], 
