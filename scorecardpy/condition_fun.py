@@ -56,13 +56,29 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
     if dat.index.duplicated().any():
         dat = dat.reset_index(drop = True)
         warnings.warn('There are duplicated index in dataset. The index has been reseted.')
-    
-    blank_cols = [i for i in list(dat) if dat[i].astype(str).str.findall(r'^\s*$').apply(lambda x:0 if len(x)==0 else 1).sum()>0]
+
+    # replace ""
+    blank_cols = [col for col in list(dat) if
+                  dat[col].astype(str).str.findall(r'^\s*$').apply(lambda x: 0 if len(x) == 0 else 1).sum() > 0]
     if len(blank_cols) > 0:
-        warnings.warn('There are blank strings in {} columns, which are replaced with NaN. \n (ColumnNames: {})'.format(len(blank_cols), ', '.join(blank_cols)))
-#        dat[dat == [' ','']] = np.nan
-#        dat2 = dat.apply(lambda x: x.str.strip()).replace(r'^\s*$', np.nan, regex=True)
-        dat.replace(r'^\s*$', np.nan, regex=True)
+        warnings.warn('There are blank strings in {} columns, which are replaced with NaN. \n (ColumnNames: {})'.format(
+            len(blank_cols), ', '.join(blank_cols)))
+        #        dat[dat == [' ','']] = np.nan
+        #        dat2 = dat.apply(lambda x: x.str.strip()).replace(r'^\s*$', np.nan, regex=True)
+        for col in blank_cols:
+            dat.loc[dat[col] == "", col] = np.nan
+
+    # replace inf or nan
+    cols_num = [col for col in list(dat) if col not in blank_cols]
+    if len(cols_num) > 0:
+        cols_inf_nan = [col for col in cols_num if
+                        dat[col].isnull().T.any() | any(dat[col] == np.inf) | any(dat[col] == -np.inf)]
+        if len(cols_inf_nan) > 0:
+            warnings.warn(
+                'There are infinite or NaN values in {} columns, which are replaced with -999.\n (ColumnNames: {})'.format(
+                    len(cols_inf_nan), ', '.join(cols_inf_nan)))
+            for col in cols_inf_nan:
+                dat.loc[(dat[col] == np.inf) | (dat[col] == -np.inf) | (dat[col].isnull()), col] = -999
     
     return dat
 
