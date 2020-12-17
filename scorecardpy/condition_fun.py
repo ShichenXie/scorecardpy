@@ -57,7 +57,7 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
         dat = dat.reset_index(drop = True)
         warnings.warn('There are duplicated index in dataset. The index has been reseted.')
 
-    # replace ""
+    # replace "" with NaN
     blank_cols = [col for col in list(dat) if
                   dat[col].astype(str).str.findall(r'^\s*$').apply(lambda x: 0 if len(x) == 0 else 1).sum() > 0]
     if len(blank_cols) > 0:
@@ -68,17 +68,17 @@ def rep_blank_na(dat): # cant replace blank string in categorical value with nan
         for col in blank_cols:
             dat.loc[dat[col] == "", col] = np.nan
 
-    # replace inf or nan
+    # replace inf with -999
     cols_num = [col for col in list(dat) if col not in blank_cols]
     if len(cols_num) > 0:
-        cols_inf_nan = [col for col in cols_num if
-                        dat[col].isnull().T.any() | any(dat[col] == np.inf) | any(dat[col] == -np.inf)]
-        if len(cols_inf_nan) > 0:
+        cols_inf = [col for col in cols_num if
+                        any(dat[col] == np.inf) | any(dat[col] == -np.inf)]
+        if len(cols_inf) > 0:
             warnings.warn(
                 'There are infinite or NaN values in {} columns, which are replaced with -999.\n (ColumnNames: {})'.format(
-                    len(cols_inf_nan), ', '.join(cols_inf_nan)))
-            for col in cols_inf_nan:
-                dat.loc[(dat[col] == np.inf) | (dat[col] == -np.inf) | (dat[col].isnull()), col] = -999
+                    len(cols_inf), ', '.join(cols_inf)))
+            for col in cols_inf:
+                dat.loc[(dat[col] == np.inf) | (dat[col] == -np.inf), col] = -999
     
     return dat
 
