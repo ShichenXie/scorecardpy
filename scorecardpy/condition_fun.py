@@ -94,8 +94,6 @@ def check_y(dat, y, positive):
     elif dat.shape[1] <= 1:
         raise Exception("Incorrect inputs; dat should be a DataFrame with at least two columns.")
 
-
-    
     # y ------
     y = str_to_list(y)
     # length of y == 1
@@ -112,7 +110,6 @@ def check_y(dat, y, positive):
         warnings.warn("There are NaNs in \'{}\' column. The rows with NaN in \'{}\' were removed from dat.".format(y,y))
         dat = dat.dropna(subset=[y])
         # dat = dat[pd.notna(dat[y])]
-    
     
     # numeric y to int
     if is_numeric_dtype(dat[y]):

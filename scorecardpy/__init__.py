@@ -9,9 +9,10 @@ from scorecardpy.woebin import (woebin, woebin_ply, woebin_plot, woebin_adj)
 from scorecardpy.perf import (perf_eva, perf_psi)
 from scorecardpy.scorecard import (scorecard, scorecard_ply)
 from scorecardpy.one_hot import one_hot
+from scorecardpy.vif import vif
 
 
-__version__ = '0.1.9.2'
+__version__ = '0.1.9.3'
 
 __all__ = (
     germancredit,
@@ -21,5 +22,6 @@ __all__ = (
     woebin, woebin_ply, woebin_plot, woebin_adj,
     perf_eva, perf_psi,
     scorecard, scorecard_ply,
-    one_hot
+    one_hot,
+    vif
 )
