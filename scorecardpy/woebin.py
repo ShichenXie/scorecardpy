@@ -490,6 +490,8 @@ def woebin2_tree(dtm, init_count_distr=0.02, count_distr_limit=0.05,
     bin_list = woebin2_init_bin(dtm, init_count_distr=init_count_distr, breaks=breaks, spl_val=spl_val)
     initial_binning = bin_list['initial_binning']
     binning_sv = bin_list['binning_sv']
+    if initial_binning is None: # fix next condition npe
+        return {'binning_sv':binning_sv, 'binning':None}
     if len(initial_binning.index)==1: 
         return {'binning_sv':binning_sv, 'binning':initial_binning}
     # initialize parameters
@@ -1035,7 +1037,14 @@ def woepoints_ply1(dtx, binx, x_i, woe_points):
         # dtx.loc[:,'xi_bin'] = pd.cut(dtx[x_i], breaks_binx_other, right=False, labels=labels)
         # dtx.loc[:,'xi_bin'] = np.where(pd.isnull(dtx['xi_bin']), dtx['xi_bin'], dtx['xi_bin'].astype(str))
         #
-        mask = dtx[x_i].isin(binx_sv['V1'])
+        # mask = dtx[x_i].isin(binx_sv['V1'])
+        try:
+            # when binx_sv['V1'] is not int then cast type
+            mask = dtx[x_i].isin(binx_sv['V1'].astype('int'))
+        except:
+            # if can not cast then use as is
+            mask = dtx[x_i].isin(binx_sv['V1'])
+
         dtx.loc[mask,'xi_bin'] = dtx.loc[mask, x_i].astype(str)
         dtx = dtx[['xi_bin']].rename(columns={'xi_bin':x_i})
     ## to charcarter, na to missing
