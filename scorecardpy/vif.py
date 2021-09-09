@@ -4,7 +4,7 @@ from patsy import dmatrices
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from .condition_fun import *
 
-def vif(dt, y, x=None, merge_coef = False, positive="bad|1"):
+def vif(dt, y, x = None, merge_coef = False, positive = "bad|1"):
     '''
     Variance Inflation Factors
     ------
@@ -49,7 +49,7 @@ def vif(dt, y, x=None, merge_coef = False, positive="bad|1"):
     dt = check_y(dt, y, positive)
     # x variables
     x = x_variable(dt, y, x)
-    
+
     # dty, dtx
     ytrain = dt.loc[:,y] 
     Xtrain = dt.loc[:,x] 
@@ -61,14 +61,13 @@ def vif(dt, y, x=None, merge_coef = False, positive="bad|1"):
       Xtrain.astype(float), 
       family=sm.families.Binomial()
     ).fit()
-    
+
     # vif
     dty, dtX = dmatrices(' ~ '.join([y[0], '+'.join(x)]), data=dt, return_type="dataframe")
     dfvif = pd.DataFrame({
-        'variables': ['const', 'age_in_years', 'credit_amount', 'present_residence_since'], 
+        'variables': ['const'] + x, 
         'vif': [variance_inflation_factor(dtX.values, i) for i in range(dtX.shape[1])]
     })
-    
     # merge with coef
     if merge_coef:
         dfvif = pd.merge(
