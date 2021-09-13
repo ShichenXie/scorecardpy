@@ -1453,11 +1453,19 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
         print('>>> Adjust breaks for ({}/{}) {}?'.format(i, xs_len, x_i))
         print('1: next \n2: yes \n3: back')
         adj_brk = input("Selection: ")
-        adj_brk = int(adj_brk)
+        while isinstance(adj_brk,str):
+            if str(adj_brk).isdigit():
+                adj_brk = int(adj_brk)  
+            else:
+                adj_brk = input("Selection: ") #update by ZK 
         if adj_brk not in [0,1,2,3]:
             warnings.warn('Enter an item from the menu, or 0 to exit.')
             adj_brk = input("Selection: ")
-            adj_brk = int(adj_brk)
+            while isinstance(adj_brk,str):
+                if str(adj_brk).isdigit():
+                    adj_brk = int(adj_brk)  
+                else:
+                    adj_brk = input("Selection: ") #update by ZK 
         return adj_brk
         
     # init param
