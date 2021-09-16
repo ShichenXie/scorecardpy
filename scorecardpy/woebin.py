@@ -113,11 +113,18 @@ def dtm_binning_sv(dtm, breaks, spl_val):
             # sv_df = sv_df.assign(value = lambda x: x.value.astype(dtm['value'].dtypes))
         # dtm_sv & dtm
         # dtm_sv = pd.merge(dtm.fillna("missing"), sv_df[['value']].fillna("missing"), how='inner', on='value', right_index=True)
+        if None in dtm.index.names and len(dtm.index.names)==1: 
+            dtm_index='index'
+        elif None in dtm.index.names and len(dtm.index.names)>1:
+            raise ValueError("multiindex's names contain Nonetype")
+        else:
+            dtm_index=dtm.index.names #update by ZK
+        
         dtm_sv = pd.merge(
           dtm.fillna("missing").reset_index(),
           sv_df[['value']].fillna("missing"), 
           how='inner', on='value'
-        ).set_index('index')
+        ).set_index(dtm_index) #update by ZK
 
         dtm = dtm[~dtm.index.isin(dtm_sv.index)].reset_index() if len(dtm_sv.index) < len(dtm.index) else None
         # dtm_sv = dtm.query('value in {}'.format(sv_df['value'].tolist()))
@@ -1453,11 +1460,15 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
         print('>>> Adjust breaks for ({}/{}) {}?'.format(i, xs_len, x_i))
         print('1: next \n2: yes \n3: back')
         adj_brk = input("Selection: ")
-        adj_brk = int(adj_brk)
-        if adj_brk not in [0,1,2,3]:
-            warnings.warn('Enter an item from the menu, or 0 to exit.')
-            adj_brk = input("Selection: ")
-            adj_brk = int(adj_brk)
+        while isinstance(adj_brk,str):
+            if str(adj_brk).isdigit():
+                adj_brk = int(adj_brk)
+                if adj_brk not in [0,1,2,3]:
+                    warnings.warn('Enter an item from the menu, or 0 to exit.')               
+                    adj_brk = input("Selection: ")  
+            else: 
+                print('Input could not be converted to digit.')
+                adj_brk = input("Selection: ") #update by ZK 
         return adj_brk
         
     # init param
