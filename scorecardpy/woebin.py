@@ -250,7 +250,7 @@ def pretty(low, high, n):
     '''
     # nicenumber
     def nicenumber(x):
-        exp = np.trunc(np.log10(abs(x)))
+        exp = np.floor(np.log10(abs(x)))
         f   = abs(x) / 10**exp
         if f < 1.5:
             nf = 1.
