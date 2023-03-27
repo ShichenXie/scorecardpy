@@ -16,14 +16,14 @@ Its goal is to make the development of traditional credit risk scorecard model e
 
 ## Installation
 
-- Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
+- Install the release version of `scorecardpy` from the original package by ShichenXie [PYPI](https://pypi.org/project/scorecardpy/) with:
 ```
 pip install scorecardpy
 ```
 
-- Install the latest version of `scorecardpy` from [github](https://github.com/shichenxie/scorecardpy) with:
+- Install this development version of `scorecardpy` from [github](https://github.com/CBravoR/scorecardpy) with:
 ```
-pip install git+git://github.com/shichenxie/scorecardpy.git
+pip install git+git://github.com/CBravoR/scorecardpy.git
 ```
 
 ## Example
