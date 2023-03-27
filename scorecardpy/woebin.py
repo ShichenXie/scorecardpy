@@ -359,7 +359,7 @@ def woebin2_init_bin(dtm, init_count_distr, breaks, spl_val):
         .assign(brkp = lambda x:np.where(x['brkp'] == rm_brkp['brkp'], x['brkp2'], x['brkp']))
         # groupby brkp
         init_bin = init_bin.groupby('brkp').agg({
-          'variable':lambda x: np.unique(x),
+          'variable':lambda x: np.unique(x)[0],
           'bin': lambda x: '%,%'.join(x),
           'good': sum,
           'bad': sum
