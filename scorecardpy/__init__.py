@@ -12,7 +12,7 @@ from scorecardpy.one_hot import one_hot
 from scorecardpy.vif import vif
 
 
-__version__ = '0.1.9.3'
+__version__ = '0.1.9.4'
 
 __all__ = (
     germancredit,
