@@ -1307,9 +1307,9 @@ def woebin_plot(bins, x=None, title=None, show_iv=True):
     # plot export
     plotlist = {}
     for i in xs:
-        binx = bins[bins['variable'] == i].reset_index()
+        binx = bins[bins['variable'] == i].reset_index(drop=True)
         plotlist[i] = plot_bin(binx, title, show_iv)
-    return plotlist
+    return plotlist 
 
 
 
