@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/shichenxie/anaconda3/bin/python"
+    "python.pythonPath": "/Users/shichenxie/anaconda3/bin/python",
+    "python.analysis.typeCheckingMode": "off"
 }

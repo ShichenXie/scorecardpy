@@ -1,3 +1,7 @@
+# scorecardpy 0.1.9.4
+* fixed a bug on woebin function caused by pandas update (by @CBravoR)
+* suppressed warnings in woebin function caused by groupby operations (by @CBravoR)
+
 # scorecardpy 0.1.9.2
 * fixed a bug in woebin function caused by the new function explode in pandas >= 0.25
 * fixed a bug when intialzing binning

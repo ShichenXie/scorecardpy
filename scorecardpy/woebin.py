@@ -134,11 +134,11 @@ def dtm_binning_sv(dtm, breaks, spl_val):
             return {'binning_sv':None, 'dtm':dtm}
         # binning_sv
         binning_sv = pd.merge(
-          dtm_sv.fillna('missing').groupby(['variable','value'])['y'].agg([n0, n1])\
+          dtm_sv.fillna('missing').groupby(['variable','value'], group_keys=False)['y'].agg([n0, n1])\
           .reset_index().rename(columns={'n0':'good','n1':'bad'}),
           sv_df.fillna('missing'), 
           on='value'
-        ).groupby(['variable', 'rowid', 'bin_chr']).agg({'bad':sum,'good':sum})\
+        ).groupby(['variable', 'rowid', 'bin_chr'], group_keys=False).agg({'bad':sum,'good':sum})\
         .reset_index().rename(columns={'bin_chr':'bin'})\
         .drop('rowid', axis=1)
     else:
@@ -158,7 +158,7 @@ def check_empty_bins(dtm, binning):
         bstbrks = sorted(list(map(float, ['-inf'] + list(binright) + ['inf'])))
         labels = ['[{},{})'.format(bstbrks[i], bstbrks[i+1]) for i in range(len(bstbrks)-1)]
         dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
-        binning = dtm.groupby(['variable','bin'])['y'].agg([n0, n1])\
+        binning = dtm.groupby(['variable','bin'], group_keys=False)['y'].agg([n0, n1])\
           .reset_index().rename(columns={'n0':'good','n1':'bad'})
         # warnings.warn("The break points are modified into '[{}]'. There are empty bins based on the provided break points.".format(','.join(binright)))
         # binning
@@ -202,7 +202,7 @@ def woebin2_breaks(dtm, breaks, spl_val):
         dtm.loc[:,'bin'] = pd.cut(dtm['value'], bstbrks, right=False, labels=labels)
         dtm['bin'] = dtm['bin'].astype(str)
         
-        binning = dtm.groupby(['variable','bin'])['y'].agg([n0, n1])\
+        binning = dtm.groupby(['variable','bin'], group_keys=False)['y'].agg([n0, n1])\
           .reset_index().rename(columns={'n0':'good','n1':'bad'})
         # check empty bins for unmeric variable
         binning = check_empty_bins(dtm, binning)
@@ -225,7 +225,7 @@ def woebin2_breaks(dtm, breaks, spl_val):
           dtm, 
           bk_df.assign(bin=lambda x: x.bin_chr),
           how='left', on='value'
-        ).fillna('missing').groupby(['variable', 'rowid', 'bin'])['y'].agg([n0,n1])\
+        ).fillna('missing').groupby(['variable', 'rowid', 'bin'], group_keys=False)['y'].agg([n0,n1])\
         .rename(columns={'n0':'good','n1':'bad'})\
         .reset_index().drop('rowid', axis=1)
     # return
@@ -317,7 +317,7 @@ def woebin2_init_bin(dtm, init_count_distr, breaks, spl_val):
         labels = ['[{},{})'.format(brk[i], brk[i+1]) for i in range(len(brk)-1)]
         dtm.loc[:,'bin'] = pd.cut(dtm['value'], brk, right=False, labels=labels)#.astype(str)
         # init_bin
-        init_bin = dtm.groupby('bin')['y'].agg([n0, n1])\
+        init_bin = dtm.groupby('bin', group_keys=False)['y'].agg([n0, n1])\
         .reset_index().rename(columns={'n0':'good','n1':'bad'})
         # check empty bins for unmeric variable
         init_bin = check_empty_bins(dtm, init_bin)
@@ -329,7 +329,7 @@ def woebin2_init_bin(dtm, init_count_distr, breaks, spl_val):
         )[['variable', 'bin', 'brkp', 'good', 'bad', 'badprob']]
     else: # other type variable
         # initial binning datatable
-        init_bin = dtm.groupby('value')['y'].agg([n0,n1])\
+        init_bin = dtm.groupby('value', group_keys=False)['y'].agg([n0,n1])\
         .rename(columns={'n0':'good','n1':'bad'})\
         .assign(
           variable = dtm['variable'].values[0],
@@ -358,8 +358,8 @@ def woebin2_init_bin(dtm, init_count_distr, breaks, spl_val):
         init_bin = init_bin.assign(brkp2  = lambda x: x['brkp'].shift(shift_period))\
         .assign(brkp = lambda x:np.where(x['brkp'] == rm_brkp['brkp'], x['brkp2'], x['brkp']))
         # groupby brkp
-        init_bin = init_bin.groupby('brkp').agg({
-          'variable':lambda x: np.unique(x),
+        init_bin = init_bin.groupby('brkp', group_keys=False).agg({
+          'variable':lambda x: np.unique(x)[0],
           'bin': lambda x: '%,%'.join(x),
           'good': sum,
           'bad': sum
@@ -410,18 +410,18 @@ def woebin2_tree_add_1brkp(dtm, initial_binning, count_distr_limit, bestbreaks=N
         total_iv_all_brks = pd.melt(
           init_bin_all_breaks, id_vars=["variable", "good", "bad"], var_name='bstbin', 
           value_vars=['bstbin'+str(i) for i in breaks_set])\
-          .groupby(['variable', 'bstbin', 'value'])\
+          .groupby(['variable', 'bstbin', 'value'], group_keys=False)\
           .agg({'good':sum, 'bad':sum}).reset_index()\
           .assign(count=lambda x: x['good']+x['bad'])
           
-        total_iv_all_brks['count_distr'] = total_iv_all_brks.groupby(['variable', 'bstbin'])\
+        total_iv_all_brks['count_distr'] = total_iv_all_brks.groupby(['variable', 'bstbin'], group_keys=False)\
           ['count'].apply(lambda x: x/dtm_rows).reset_index(drop=True)
-        total_iv_all_brks['min_count_distr'] = total_iv_all_brks.groupby(['variable', 'bstbin'])\
+        total_iv_all_brks['min_count_distr'] = total_iv_all_brks.groupby(['variable', 'bstbin'], group_keys=False)\
           ['count_distr'].transform(lambda x: min(x))
           
         total_iv_all_brks = total_iv_all_brks\
           .assign(bstbin = lambda x: [float(re.sub('^bstbin', '', i)) for i in x['bstbin']] )\
-          .groupby(['variable','bstbin','min_count_distr'])\
+          .groupby(['variable','bstbin','min_count_distr'], group_keys=False)\
           .apply(lambda x: iv_01(x['good'], x['bad'])).reset_index(name='total_iv')
         # return 
         return total_iv_all_brks
@@ -439,11 +439,11 @@ def woebin2_tree_add_1brkp(dtm, initial_binning, count_distr_limit, bestbreaks=N
           bstbin = lambda x: pd.cut(x['brkp'], bestbreaks_inf, right=False, labels=labels)
         )
         if is_numeric_dtype(dtm['value']):
-            binning_1bst_brk = binning_1bst_brk.groupby(['variable', 'bstbin'])\
+            binning_1bst_brk = binning_1bst_brk.groupby(['variable', 'bstbin'], group_keys=False)\
             .agg({'good':sum, 'bad':sum}).reset_index().assign(bin=lambda x: x['bstbin'])\
             [['bstbin', 'variable', 'bin', 'good', 'bad']]
         else:
-            binning_1bst_brk = binning_1bst_brk.groupby(['variable', 'bstbin'])\
+            binning_1bst_brk = binning_1bst_brk.groupby(['variable', 'bstbin'], group_keys=False)\
             .agg({'good':sum, 'bad':sum, 'bin':lambda x:'%,%'.join(x)}).reset_index()\
             [['bstbin', 'variable', 'bin', 'good', 'bad']]
         # format
@@ -579,13 +579,13 @@ def woebin2_chimerge(dtm, init_count_distr=0.02, count_distr_limit=0.05,
           var_name='goodbad', value_name='a')\
         .sort_values(by=['goodbad', 'brkp']).reset_index(drop=True)
         ###
-        chisq_df['a_lag'] = chisq_df.groupby('goodbad')['a'].apply(lambda x: x.shift(1))#.reset_index(drop=True)
-        chisq_df['a_rowsum'] = chisq_df.groupby('brkp')['a'].transform(lambda x: sum(x))#.reset_index(drop=True)
-        chisq_df['a_lag_rowsum'] = chisq_df.groupby('brkp')['a_lag'].transform(lambda x: sum(x))#.reset_index(drop=True)
+        chisq_df['a_lag'] = chisq_df.groupby('goodbad', group_keys=False)['a'].apply(lambda x: x.shift(1))#.reset_index(drop=True)
+        chisq_df['a_rowsum'] = chisq_df.groupby('brkp', group_keys=False)['a'].transform(lambda x: sum(x))#.reset_index(drop=True)
+        chisq_df['a_lag_rowsum'] = chisq_df.groupby('brkp', group_keys=False)['a_lag'].transform(lambda x: sum(x))#.reset_index(drop=True)
         ###
         chisq_df = pd.merge(
           chisq_df.assign(a_colsum = lambda df: df.a+df.a_lag), 
-          chisq_df.groupby('brkp').apply(lambda df: sum(df.a+df.a_lag)).reset_index(name='a_sum'))\
+          chisq_df.groupby('brkp', group_keys=False).apply(lambda df: sum(df.a+df.a_lag)).reset_index(name='a_sum'))\
         .assign(
           e = lambda df: df.a_rowsum*df.a_colsum/df.a_sum,
           e_lag = lambda df: df.a_lag_rowsum*df.a_colsum/df.a_sum
@@ -637,7 +637,7 @@ def woebin2_chimerge(dtm, init_count_distr=0.02, count_distr_limit=0.05,
         binning_chisq = binning_chisq.assign(brkp2  = lambda x: x['brkp'].shift(shift_period))\
         .assign(brkp = lambda x:np.where(x['brkp'] == rm_brkp['brkp'], x['brkp2'], x['brkp']))
         # groupby brkp
-        binning_chisq = binning_chisq.groupby('brkp').agg({
+        binning_chisq = binning_chisq.groupby('brkp', group_keys=False).agg({
           'variable':lambda x:np.unique(x),
           'bin': lambda x: '%,%'.join(x),
           'good': sum,
@@ -765,7 +765,7 @@ def bins_to_breaks(bins, dt, to_string=False, save_string=None):
     bins_breakslist = bins[~bins['breaks'].isin(["-inf","inf","missing"]) & ~bins['is_special_values']]
     bins_breakslist = pd.merge(bins_breakslist[['variable', 'breaks']], vars_class, how='left', on='variable')
     bins_breakslist.loc[bins_breakslist['not_numeric'], 'breaks'] = '\''+bins_breakslist.loc[bins_breakslist['not_numeric'], 'breaks']+'\''
-    bins_breakslist = bins_breakslist.groupby('variable')['breaks'].agg(lambda x: ','.join(x))
+    bins_breakslist = bins_breakslist.groupby('variable', group_keys=False)['breaks'].agg(lambda x: ','.join(x))
     
     if to_string:
         bins_breakslist = "breaks_list={\n"+', \n'.join('\''+bins_breakslist.index[i]+'\': ['+bins_breakslist[i]+']' for i in np.arange(len(bins_breakslist)))+"}"
@@ -1301,15 +1301,15 @@ def woebin_plot(bins, x=None, title=None, show_iv=True):
         binx['good_distr'] = binx['good']/sum(binx['count'])
         binx['bad_distr'] = binx['bad']/sum(binx['count'])
         return binx
-    bins = bins.groupby('variable').apply(gb_distr)
+    bins = bins.groupby('variable', group_keys=False).apply(gb_distr)
     # x variable names
     if xs is None: xs = bins['variable'].unique()
     # plot export
     plotlist = {}
     for i in xs:
-        binx = bins[bins['variable'] == i].reset_index()
+        binx = bins[bins['variable'] == i].reset_index(drop=True)
         plotlist[i] = plot_bin(binx, title, show_iv)
-    return plotlist
+    return plotlist 
 
 
 
@@ -1436,10 +1436,10 @@ def woebin_adj(dt, y, bins, adj_all_var=False, special_values=None, method="tree
     # adjust all variables
     if not adj_all_var:
         bins2 = bins.loc[~((bins['bin'] == 'missing') & (bins['count_distr'] >= count_distr_limit))].reset_index(drop=True)
-        bins2['badprob2'] = bins2.groupby('variable').apply(lambda x: x['badprob'].shift(1)).reset_index(drop=True)
+        bins2['badprob2'] = bins2.groupby('variable', group_keys=False).apply(lambda x: x['badprob'].shift(1)).reset_index(drop=True)
         bins2 = bins2.dropna(subset=['badprob2']).reset_index(drop=True)
         bins2 = bins2.assign(badprob_trend = lambda x: x.badprob >= x.badprob2)
-        xs_adj = bins2.groupby('variable')['badprob_trend'].nunique()
+        xs_adj = bins2.groupby('variable', group_keys=False)['badprob_trend'].nunique()
         xs_adj = xs_adj[xs_adj>1].index
     else:
         xs_adj = xs_all
