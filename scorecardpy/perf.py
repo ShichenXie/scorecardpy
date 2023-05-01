@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import math
 import matplotlib.pyplot as plt
 import warnings
 from .condition_fun import *
@@ -310,8 +311,8 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
     ### export plot ### 
     if show_plot:
         plist = ["eva_p"+i+'(df_'+i+',title)' for i in plot_type]
-        subplot_nrows = np.ceil(len(plist)/2)
-        subplot_ncols = np.ceil(len(plist)/subplot_nrows)
+        subplot_nrows = math.ceil(len(plist)/2)
+        subplot_ncols = math.ceil(len(plist)/subplot_nrows)
         
         fig = plt.figure()
         for i in np.arange(len(plist)):
