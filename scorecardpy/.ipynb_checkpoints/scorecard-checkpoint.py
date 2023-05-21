@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import re
 from .condition_fun import *
-from .woebin import woepoints_ply1, woebin_ply
+from .woebin import woepoints_ply1
 
 
 # coefficients in scorecard
@@ -112,85 +112,29 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
     # bins # if (is.list(bins)) rbindlist(bins)
     if isinstance(bins, dict):
         bins = pd.concat(bins, ignore_index=True)
-  
+    xs = [re.sub('_woe$', '', i) for i in xcolumns]
     # coefficients
-    if str(type(model)) == "<class 'sklearn.linear_model._logistic.LogisticRegression'>":
-      coef_df = pd.Series(model.coef_[0], index=np.array([re.sub('_woe$', '', i) for i in xcolumns]))\
+    coef_df = pd.Series(model.coef_[0], index=np.array(xs))\
       .loc[lambda x: x != 0]#.reset_index(drop=True)
-      coef_const = model.intercept_[0]
-    elif str(type(model)) == "<class 'statsmodels.genmod.generalized_linear_model.GLMResultsWrapper'>":
-      coef_df = model.summary2().tables[1].loc[:,'Coef.']
-      coef_const = coef_df['const']
-      coef_df = coef_df.drop('const')
-      coef_df.index = [re.sub('_woe$', '', i) for i in coef_df.index]
-      
+    
     # scorecard
     len_x = len(coef_df)
-    basepoints = a - b*coef_const
+    basepoints = a - b*model.intercept_[0]
     card = {}
     if basepoints_eq0:
         card['basepoints'] = pd.DataFrame({'variable':"basepoints", 'bin':np.nan, 'points':0}, index=np.arange(1))
         for i in coef_df.index:
-            card[i] = bins.loc[bins['variable']==i, ['variable', 'bin', 'woe']]\
+            card[i] = bins.loc[bins['variable']==i,['variable', 'bin', 'woe']]\
               .assign(points = lambda x: round(-b*x['woe']*coef_df[i] + basepoints/len_x), ndigits=digits)\
               [["variable", "bin", "points"]]
     else:
         card['basepoints'] = pd.DataFrame({'variable':"basepoints", 'bin':np.nan, 'points':round(basepoints, ndigits=digits)}, index=np.arange(1))
         for i in coef_df.index:
-            card[i] = bins.loc[bins['variable']==i, ['variable', 'bin', 'woe']]\
+            card[i] = bins.loc[bins['variable']==i,['variable', 'bin', 'woe']]\
               .assign(points = lambda x: round(-b*x['woe']*coef_df[i]), ndigits=digits)\
               [["variable", "bin", "points"]]
     return card
 
-def scorecard2(bins, dt, y, x=None, points0=600, odds0=1/19, pdo=50, basepoints_eq0=False, digits=0, 
-  return_prob = False, positive='bad|1', **kwargs): 
-    
-  # data frame to list
-  if isinstance(dt, pd.DataFrame): dt = {'dat': dt}
-  # check y column
-  for i in dt.keys():
-    dt[i] = check_y(dt[i], y, positive)
-    
-  # dt0
-  dtfstkey = list(dt.keys())[0]
-  dt0 = dt[dtfstkey]
-
-  # bind bins
-  if isinstance(bins, dict): bins = pd.concat(bins, ignore_index=True)
-        
-  # check xs
-  x_bins = bins['variable'].unique()
-  if x is None: x = x_bins
-  x = x_variable(dt0,y,x)
-  x_woe = ['_'.join([i, 'woe']) for i in x]
-
-  # dt to woe
-  dt_woe = {}
-  for i in dt.keys():
-    dt_woe[i] = woebin_ply(dt[i], bins=bins, print_info=False)
-  dt0_woe = dt_woe[dtfstkey]
-
-  # model
-  lrmodel = lr(dt0_woe, y=y, x=x_woe)
-
-  # scorecard
-  card = scorecard(bins = bins, model = lrmodel, xcolumns=x_woe, points0 = points0, odds0 = odds0, pdo = pdo, basepoints_eq0 = basepoints_eq0, digits = digits)
-  
-  # returns
-  if return_prob is True:
-    probdict = {}
-    for i in dt.keys():
-      dtx_woe = dt_woe[i].loc[:,x_woe] 
-      dtx_woe = sm.add_constant(dtx_woe)
-      probdict[i] = lrmodel.predict(dtx_woe)
-    rt = {
-      'card': card, 
-      'prob': probdict
-    }
-  else:
-    rt = card
-    
-  return rt
 
 
 def scorecard_ply(dt, card, only_total_score=True, print_step=0, replace_blank_na=True, var_kp = None):

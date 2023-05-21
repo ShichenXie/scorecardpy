@@ -5,21 +5,6 @@ import numpy as np
 import warnings
 import re
 from pandas.api.types import is_numeric_dtype
-import statsmodels.api as sm
-
-def lr(dt, y, x):
-  # dty
-  dty = dt.loc[:,y] 
-  # dtx
-  dtx = dt.loc[:,x] 
-  dtx = sm.add_constant(dtx)
-  # logistic regression
-  lrfit = sm.GLM(
-    dty.astype(float), 
-    dtx.astype(float), 
-    family=sm.families.Binomial()
-  ).fit()
-  return lrfit
 
 def str_to_list(x):
     if x is not None and isinstance(x, str):

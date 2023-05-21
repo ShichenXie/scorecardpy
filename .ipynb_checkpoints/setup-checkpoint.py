@@ -28,7 +28,6 @@ with open(path.join(here, 'scorecardpy/__init__.py'), encoding='utf-8') as f:
 setup(
     name='scorecardpy',  # Required
     version=__version__,  # Required
-    package_dir={'scorecardpy':'scorecardpy'},
     description='Credit Risk Scorecard',  # Required
     long_description=long_description,  # Optional
     long_description_content_type='text/markdown',  # Optional (see note above)
@@ -56,9 +55,6 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10'
     ],
     keywords='credit scorecard, woe binning, performace evaluation',  # Optional
     packages=['scorecardpy'],  # Required

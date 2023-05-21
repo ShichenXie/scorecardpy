@@ -4,20 +4,6 @@ from patsy import dmatrices
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from .condition_fun import *
 
-def lr(dt, y, x):
-  # dty
-  dty = dt.loc[:,y] 
-  # dtx
-  dtx = dt.loc[:,x] 
-  dtx = sm.add_constant(dtx)
-  # logistic regression
-  lrfit = sm.GLM(
-    dty.astype(float), 
-    dtx.astype(float), 
-    family=sm.families.Binomial()
-  ).fit()
-  return lrfit
-  
 def vif(dt, y, x = None, merge_coef = False, positive = "bad|1"):
     '''
     Variance Inflation Factors
@@ -64,9 +50,18 @@ def vif(dt, y, x = None, merge_coef = False, positive = "bad|1"):
     # x variables
     x = x_variable(dt, y, x)
 
-    # logistic regression
-    lrfit = lr(dt, y, x)
+    # dty, dtx
+    ytrain = dt.loc[:,y] 
+    Xtrain = dt.loc[:,x] 
+    Xtrain = sm.add_constant(Xtrain)
     
+    # logistic regression
+    lrfit = sm.GLM(
+      ytrain.astype(float), 
+      Xtrain.astype(float), 
+      family=sm.families.Binomial()
+    ).fit()
+
     # vif
     dty, dtX = dmatrices(' ~ '.join([y[0], '+'.join(x)]), data=dt, return_type="dataframe")
     dfvif = pd.DataFrame({
