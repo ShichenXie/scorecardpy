@@ -60,7 +60,7 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
     Creating a Scorecard
     ------
     `scorecard` creates a scorecard based on the results from `woebin` 
-    and LogisticRegression of sklearn.linear_model
+    and LogisticRegression object from sklearn or statsmodels
     
     Params
     ------
@@ -158,9 +158,63 @@ def scorecard(bins, model, xcolumns, points0=600, odds0=1/19, pdo=50, basepoints
               [["variable", "bin", "points"]]
     return card
 
+
 def scorecard2(bins, dt, y, x=None, points0=600, odds0=1/19, pdo=50, basepoints_eq0=False, digits=0, 
   return_prob = False, positive='bad|1', **kwargs): 
+    '''
+    Creating a Scorecard
+    ------
+    `scorecard2` creates a scorecard based on the results from woebin. It has 
+    the same function of scorecard, but without model object input.
     
+    Params
+    ------
+    bins: Binning information generated from woebin function.
+    dt: A data frame with both x (predictor/feature) and y (response/label) variables.
+    y: Name of y variable.
+    x: Name of x variables. If it is None, then all variables in bins are used. Defaults to None.
+    points0: Target points, default 600.
+    odds0: Target odds, default 1/19. Odds = p/(1-p).
+    pdo: Points to Double the Odds, default 50.
+    basepoints_eq0: Logical, defaults to False. If it is True, the basepoints will equally distribute to each variable.
+    digits: The number of digits after the decimal point for points calculation. Default 0.
+    return_prob: Logical, defaults to False. If it is True, the predict probability will also return.
+    kwargs: Additional parameters.
+    
+    Returns
+    ------
+    A scorecard data frames
+    
+    Examples
+    ------
+    # load data
+    import scorecardpy as sc
+    dt = sc.germancredit()
+    
+    # filter variable via missing rate, iv, identical value rate
+    dtvf = sc.var_filter(dt, "creditability")
+    
+    # split into train and test
+    dtlst = sc.split_df(dtvf, y = 'creditability')
+    # binning
+    bins = sc.woebin(dtlst['train'], "creditability")
+    
+    # train only
+    ## create scorecard
+    card1 = sc.scorecard2(bins=bins, dt=dtlst['train'], y='creditability')
+    ## scorecard and predicted probability
+    cardprob1 = sc.scorecard2(bins=bins, dt=dtlst['train'], y='creditability', return_prob = True)
+    print(cardprob1.keys())
+    
+    # both train and test
+    ## create scorecard
+    card2 = sc.scorecard2(bins=bins, dt=dtlst, y='creditability')
+    ## scorecard and predicted probability
+    cardprob2 = sc.scorecard2(bins=bins, dt=dtlst, y='creditability', return_prob = True)
+    print(cardprob2.keys())
+    print(cardprob2['prob'].keys())
+    '''
+        
   # data frame to list
   if isinstance(dt, pd.DataFrame): dt = {'dat': dt}
   # check y column
@@ -183,7 +237,7 @@ def scorecard2(bins, dt, y, x=None, points0=600, odds0=1/19, pdo=50, basepoints_
   # dt to woe
   dt_woe = {}
   for i in dt.keys():
-    dt_woe[i] = woebin_ply(dt[i], bins=bins, print_info=False)
+    dt_woe[i] = woebin_ply(dt[i], bins=bins, print_info=False, kwargs)
   dt0_woe = dt_woe[dtfstkey]
 
   # model
