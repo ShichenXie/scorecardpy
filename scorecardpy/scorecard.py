@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import statsmodels.api as sm
+
+def lr(dt, y, x):
+  # dty
+  dty = dt.loc[:,y] 
+  # dtx
+  dtx = dt.loc[:,x] 
+  dtx = sm.add_constant(dtx)
+  # logistic regression
+  lrfit = sm.GLM(
+    dty.astype(float), 
+    dtx.astype(float), 
+    family=sm.families.Binomial()
+  ).fit()
+  return lrfit
+
 import pandas as pd
 import numpy as np
 import re
