@@ -143,7 +143,8 @@ def check_y(dat, y, positive):
             raise Exception("Incorrect inputs; the positive value in \"{}\" is not specified".format(y))
     else:
         raise Exception("Incorrect inputs; the length of unique values in y column \'{}\' != 2.".format(y))
-    
+    # to int
+    dat[y] = dat[y].astype('int')
     return dat
 
 
