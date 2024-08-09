@@ -1,3 +1,6 @@
+# scorecardpy 0.2.0
+* fixed a bug in the woebin_ply function when the special_values param is specified.
+
 # scorecardpy 0.1.9.7
 * fixed a bug in function perf_eva
 
