@@ -1,3 +1,9 @@
+# scorecardpy 0.2.1
+* performance optimization: pre-compiled 9 regex patterns in woebin.py to reduce repeated compilation overhead in loops
+* performance optimization: replaced chained .assign() calls with direct column assignment in woebin functions to minimize intermediate DataFrame creation
+* performance optimization: replaced manual AUC calculation with sklearn.metrics.roc_auc_score in perf_eva for faster computation
+* performance optimization: replaced eval() with dictionary mapping for dynamic plot function calls in perf_eva for better security and performance
+
 # scorecardpy 0.2.0
 * fixed a bug in the woebin_ply function when the special_values param is specified.
 
