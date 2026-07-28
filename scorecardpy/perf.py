@@ -4,7 +4,24 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
+from sklearn.metrics import roc_auc_score
 from .condition_fun import *
+
+_PLOT_FUNC_MAP = {
+    "ks": "eva_pks",
+    "lift": "eva_plift",
+    "roc": "eva_proc",
+    "pr": "eva_ppr",
+    "f1": "eva_pf1",
+}
+
+_PLOT_DATA_MAP = {
+    "ks": "df_ks",
+    "lift": "df_lift",
+    "roc": "df_roc",
+    "pr": "df_pr",
+    "f1": "df_f1",
+}
 
 
 def eva_dfkslift(df, groupnum=None):
@@ -295,28 +312,22 @@ def perf_eva(label, pred, title=None, groupnum=None, plot_type=["ks", "roc"], sh
         rt['KS'] = round(dfkslift.loc[lambda x: x.ks==max(x.ks),'ks'].iloc[0],4)
     # plot, ROC ------
     if 'roc' in plot_type:
-        auc = pd.concat(
-          [dfrocpr[['FPR','TPR']], pd.DataFrame({'FPR':[0,1], 'TPR':[0,1]})], 
-          ignore_index=True).sort_values(['FPR','TPR'])\
-          .assign(
-            TPR_lag=lambda x: x['TPR'].shift(1), FPR_lag=lambda x: x['FPR'].shift(1)
-          ).assign(
-            auc=lambda x: (x.TPR+x.TPR_lag)*(x.FPR-x.FPR_lag)/2
-          )['auc'].sum()
-        ### 
+        auc = roc_auc_score(df['label'], df['pred'])
         rt['AUC'] = round(auc, 4)
         rt['Gini'] = round(2*auc-1, 4)
     
     ### export plot ### 
     if show_plot:
-        plist = ["eva_p"+i+'(df_'+i+',title)' for i in plot_type]
-        subplot_nrows = int(np.ceil(len(plist)/2))
-        subplot_ncols = int(np.ceil(len(plist)/subplot_nrows))
+        subplot_nrows = int(np.ceil(len(plot_type)/2))
+        subplot_ncols = int(np.ceil(len(plot_type)/subplot_nrows))
         
         fig = plt.figure()
-        for i in np.arange(len(plist)):
-            plt.subplot(subplot_nrows,subplot_ncols,i+1)
-            eval(plist[i])
+        for idx, ptype in enumerate(plot_type):
+            plt.subplot(subplot_nrows, subplot_ncols, idx+1)
+            func_name = _PLOT_FUNC_MAP.get(ptype)
+            data_key = _PLOT_DATA_MAP.get(ptype)
+            if func_name and data_key and data_key in locals():
+                globals()[func_name](locals()[data_key], title)
         plt.show()
         rt['pic'] = fig
     # return 
