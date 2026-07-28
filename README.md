@@ -14,6 +14,13 @@ Its goal is to make the development of traditional credit risk scorecard model e
 - scorecard scaling (`scorecard`, `scorecard_ply`)
 - performance evaluation (`perf_eva`, `perf_psi`)
 
+## Performance Optimizations
+
+This fork includes several performance improvements over the original scorecardpy:
+
+- **WOE Binning Optimization**: Pre-compiled regex patterns and reduced DataFrame chaining in `woebin` functions for faster binning
+- **Performance Evaluation Optimization**: Replaced manual AUC calculation with `sklearn.metrics.roc_auc_score` for significant speedup; eliminated `eval()` usage with dictionary-based function dispatch for better security and performance
+
 ## Installation
 
 - Install the release version of `scorecardpy` from [PYPI](https://pypi.org/project/scorecardpy/) with:
